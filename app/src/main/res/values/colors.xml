@@ -1,0 +1,12 @@
+<resources>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="background_color">#F0F0F0</color>
+    <color name="primary_color">#455A64</color> <!-- Azul grisáceo oscuro para los botones principales -->
+    <color name="primary_variant_color">#37474F</color> <!-- Variante más oscura del azul grisáceo -->
+    <color name="secondary_color">#B0BEC5</color> <!-- Gris claro azulado para botones secundarios -->
+    <color name="secondary_variant_color">#CFD8DC</color> <!-- Variante más clara del gris azulado -->
+    <color name="primary_text_color">#FFFFFF</color> <!-- Texto principal en blanco para contrastar -->
+    <color name="secondary_text_color">#212121</color> <!-- Texto en gris oscuro para los botones más claros -->
+    <color name="primary_light">#ECEFF1</color> <!-- Fondo suave en gris muy claro -->
+</resources>

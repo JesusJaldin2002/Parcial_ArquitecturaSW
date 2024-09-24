@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Formulario de registro de cliente -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvRegistrarCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="Registrar Cliente"
+                android:textColor="@color/black"
+                android:fontFamily="sans-serif-black"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/imgCliente"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginBottom="24dp"
+                android:elevation="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_add_photo" />
+
+            <EditText
+                android:id="@+id/etNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Nombre del Cliente"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etNroTelefono"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Número de Teléfono"
+                android:inputType="phone"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="32dp">
+
+            <Button
+                android:id="@+id/btnRegistrar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Agregar Cliente"
+                android:backgroundTint="@color/primary_color"
+                android:textColor="@android:color/white"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnListarClientes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Listar Clientes"
+                android:backgroundTint="@color/secondary_color"
+                android:textColor="@android:color/white"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnCancelar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volver atrás"
+                android:backgroundTint="@color/secondary_color"
+                android:textColor="@android:color/white"
+                android:padding="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Definir el radio para los bordes redondeados -->
+    <corners android:radius="20dp"/>
+
+    <!-- Opcional: añadir un borde de color -->
+    <solid android:color="@android:color/transparent"/>
+
+</shape>

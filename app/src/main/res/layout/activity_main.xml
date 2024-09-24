@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/textViewTitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¡Bienvenido!"
+        android:textAlignment="center"
+        android:textSize="28sp"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp" />
+
+    <TextView
+        android:id="@+id/textViewSubtitulo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Estamos aquí para ayudarte a crecer."
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:fontFamily="sans-serif-black"
+        app:layout_constraintTop_toBottomOf="@id/textViewTitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp" />
+
+    <Button
+        android:id="@+id/btnCliente"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Clientes"
+        android:backgroundTint="@color/primary_color"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/textViewSubtitulo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+    <Button
+        android:id="@+id/nuevoRepartidor"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Repartidores"
+        android:backgroundTint="@color/secondary_color"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/btnCliente"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/nuevaCategoria"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Categorías"
+        android:backgroundTint="@color/primary_color"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/nuevoRepartidor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/nuevoProducto"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Productos"
+        android:backgroundTint="@color/secondary_color"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/nuevaCategoria"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/nuevaOrden"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Órdenes"
+        android:backgroundTint="@color/primary_color"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/nuevoProducto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
