@@ -50,10 +50,10 @@
         android:layout_marginTop="24dp" />
 
     <Button
-        android:id="@+id/nuevoRepartidor"
+        android:id="@+id/btnCategoria"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:text="Gestionar Repartidores"
+        android:text="Gestionar Categorías"
         android:backgroundTint="@color/secondary_color"
         android:textColor="@color/black"
         android:textSize="16sp"
@@ -63,40 +63,40 @@
         android:layout_marginTop="16dp" />
 
     <Button
-        android:id="@+id/nuevaCategoria"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:text="Gestionar Categorías"
-        android:backgroundTint="@color/primary_color"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/nuevoRepartidor"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <Button
-        android:id="@+id/nuevoProducto"
+        android:id="@+id/btnProducto"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:text="Gestionar Productos"
-        android:backgroundTint="@color/secondary_color"
-        android:textColor="@color/black"
+        android:backgroundTint="@color/primary_color"
+        android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/nuevaCategoria"
+        app:layout_constraintTop_toBottomOf="@id/btnCategoria"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
     <Button
-        android:id="@+id/nuevaOrden"
+        android:id="@+id/btnOrden"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:text="Gestionar Órdenes"
+        android:backgroundTint="@color/secondary_color"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/btnProducto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnCatalogo"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Catálogo"
         android:backgroundTint="@color/primary_color"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/nuevoProducto"
+        app:layout_constraintTop_toBottomOf="@id/btnOrden"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />

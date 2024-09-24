@@ -8,6 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.primerparcial.datos.DBHelper;
+import com.example.primerparcial.presentacion.categoria.PCategoria;
 import com.example.primerparcial.presentacion.cliente.PCliente;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,18 +21,21 @@ public class MainActivity extends AppCompatActivity {
         inicializarBaseDeDatos();
 
         Button btnClientes = findViewById(R.id.btnCliente);
-        btnClientes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, PCliente.class);
-                startActivity(intent);
-            }
+        btnClientes.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, PCliente.class);
+            startActivity(intent);
         });
 
-        Button btnRepartidores = findViewById(R.id.nuevoRepartidor);
-        Button btnCategorias = findViewById(R.id.nuevaCategoria);
-        Button btnProductos = findViewById(R.id.nuevoProducto);
-        Button btnOrdenes = findViewById(R.id.nuevaOrden);
+        Button btnCategoria = findViewById(R.id.btnCategoria);
+        btnCategoria.setOnClickListener(v -> {
+             Intent intent = new Intent(MainActivity.this, PCategoria.class);
+             startActivity(intent);
+        });
+
+        Button btnProducto = findViewById(R.id.btnProducto);
+
+        Button btnOrden = findViewById(R.id.btnOrden);
+        Button btnCatalogo = findViewById(R.id.btnCatalogo);
 
         // Aún no hacen nada, pero se implementarán en el futuro
     }

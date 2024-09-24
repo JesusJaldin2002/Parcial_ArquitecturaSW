@@ -33,6 +33,11 @@
             android:name=".presentacion.posicion.PPosicion"
             android:label="Primer Parcial - Ubicaciones"
             android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.categoria.PCategoria"
+            android:label="Primer Parcial - Categorías"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 
