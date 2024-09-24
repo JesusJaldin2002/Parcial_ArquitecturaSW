@@ -11,25 +11,25 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/tvListaClientes"
+            android:id="@+id/tvTituloUbicaciones"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif-black"
-            android:text="Lista de Clientes"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Ubicaciones"
             android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/btnVolver"
-            app:layout_constraintHorizontal_bias="0.311"
+            app:layout_constraintEnd_toStartOf="@id/btnVolverAtras"
+            app:layout_constraintHorizontal_bias="0.079"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Button
-            android:id="@+id/btnVolver"
+            android:id="@+id/btnVolverAtras"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
             android:backgroundTint="@color/primary_color"
             android:padding="8dp"
@@ -38,17 +38,31 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/tvNombreCliente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre del Cliente"
+            android:textSize="18sp"
+            android:textStyle="italic"
+            android:layout_gravity="center"
+            android:textColor="@color/gray"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTituloUbicaciones"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Lista de Ubicaciones -->
         <LinearLayout
-            android:id="@+id/listaClientesLayout"
+            android:id="@+id/listaUbicacionesLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="8dp"
-            app:layout_constraintTop_toBottomOf="@id/tvListaClientes"
+            app:layout_constraintTop_toBottomOf="@id/tvNombreCliente"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginTop="16dp"/>
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

@@ -92,4 +92,33 @@ public class DPosicion {
         db.insert("posiciones", null, values);
         db.close();
     }
+
+    // Método para obtener las posiciones filtradas por cliente
+    public Cursor obtenerPosicionesPorCliente(int idCliente) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String[] args = {String.valueOf(idCliente)};
+        return db.rawQuery("SELECT id, nombre, urlMapa, referencia, idCliente FROM posiciones WHERE idCliente=?", args);
+    }
+
+    // Método para actualizar una posición
+    public void actualizarPosicion(String id, String nombre, String urlMapa, String referencia, int idCliente) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nombre", nombre);
+        values.put("urlMapa", urlMapa);
+        values.put("referencia", referencia);
+        values.put("idCliente", idCliente);  // Relación con la tabla clientes
+
+        // Actualizamos la posición donde el ID coincida
+        String[] args = { id };
+        db.update("posiciones", values, "id=?", args);
+        db.close();
+    }
+
+    // Método para eliminar una posición
+    public void eliminarPosicion(String id) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete("posiciones", "id=?", new String[]{id});
+        db.close();
+    }
 }

@@ -1,7 +1,9 @@
 package com.example.primerparcial.presentacion.cliente;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,18 +20,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.example.primerparcial.MainActivity;
 import com.example.primerparcial.R;
 import com.example.primerparcial.negocio.cliente.NCliente;
+import com.example.primerparcial.presentacion.posicion.PPosicion;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import android.Manifest;
-import android.content.pm.PackageManager;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import java.util.Objects;
 
 public class PCliente extends AppCompatActivity {
 
@@ -83,6 +85,7 @@ public class PCliente extends AppCompatActivity {
             startActivity(intent);
         });
     }
+
 
     // Verificar si el permiso de lectura del almacenamiento está otorgado
     private boolean checkPermission() {
@@ -211,6 +214,25 @@ public class PCliente extends AppCompatActivity {
             btnEliminarCliente.setOnClickListener(v -> {
                 // Mostrar confirmación antes de eliminar
                 eliminarClienteConConfirmacion(cliente.get("id"));
+            });
+
+            // Botón para ver las ubicaciones
+            Button btnVerUbicaciones = clienteView.findViewById(R.id.btnVerUbicacion);
+            btnVerUbicaciones.setOnClickListener(v -> {
+                Intent intent = new Intent(PCliente.this, PPosicion.class);
+                intent.putExtra("idCliente", Integer.parseInt(Objects.requireNonNull(cliente.get("id"))));
+                intent.putExtra("action", "listar");  // Indicar que debe listar ubicaciones
+                intent.putExtra("nombreCliente", cliente.get("nombre"));
+                startActivity(intent);
+            });
+
+            // En el método listarClientes de PCliente.java, modifica el OnClickListener del botón "Agregar Ubicación"
+            Button btnAgregarUbicacion = clienteView.findViewById(R.id.btnAgregarUbicacion);
+            btnAgregarUbicacion.setOnClickListener(v -> {
+                Intent intent = new Intent(PCliente.this, PPosicion.class);
+                intent.putExtra("idCliente", Integer.parseInt(Objects.requireNonNull(cliente.get("id"))));
+                intent.putExtra("action", "registrar");  // Indicar que debe registrar ubicación
+                startActivity(intent);
             });
 
             // Agregar la vista de cliente a la lista
