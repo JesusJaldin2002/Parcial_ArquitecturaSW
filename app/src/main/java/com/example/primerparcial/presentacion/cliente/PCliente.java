@@ -54,7 +54,7 @@ public class PCliente extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Inflar ambos layouts
         gestionarClienteView = getLayoutInflater().inflate(R.layout.activity_gestionar_cliente, null);
-        listarClientesView = getLayoutInflater().inflate(R.layout.activity_lista_clientes, null);
+        listarClientesView = getLayoutInflater().inflate(R.layout.lista_clientes, null);
 
         // Inicialmente, mostrar la vista de gestionar clientes
         setContentView(gestionarClienteView);
@@ -159,18 +159,21 @@ public class PCliente extends AppCompatActivity {
         String nombre = etNombre.getText().toString();
         String nroTelefono = etNroTelefono.getText().toString();
 
-        if (!nombre.isEmpty() && !nroTelefono.isEmpty() && imagenSeleccionada != null) {
+        if (!nombre.isEmpty() && !nroTelefono.isEmpty()) {
+            if (imagenSeleccionada == null) {
+                imagenSeleccionada = "default";
+            }
+
             nCliente.registrarCliente(nombre, nroTelefono, imagenSeleccionada);
             Toast.makeText(this, "Cliente registrado", Toast.LENGTH_SHORT).show();
 
             // Limpiar los campos después de registrar
             etNombre.setText("");
             etNroTelefono.setText("");
-            imgCliente.setImageResource(R.drawable.ic_add_photo);
+            imgCliente.setImageResource(R.drawable.ic_add_photo); // Volver a la imagen por defecto
             imagenSeleccionada = null;
-
         } else {
-            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Por favor, complete los campos obligatorios", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -184,7 +187,7 @@ public class PCliente extends AppCompatActivity {
         List<Map<String, String>> clientes = nCliente.obtenerClientes();
 
         for (Map<String, String> cliente : clientes) {
-            View clienteView = getLayoutInflater().inflate(R.layout.cliente_item, null);
+            View clienteView = getLayoutInflater().inflate(R.layout.item_cliente, null);
 
             // Asigna los valores a las vistas
             TextView idTextView = clienteView.findViewById(R.id.tvIdCliente);
@@ -196,13 +199,19 @@ public class PCliente extends AppCompatActivity {
             nombreTextView.setText("Nombre: " + cliente.get("nombre"));
             telefonoTextView.setText("Teléfono: " + cliente.get("nroTelefono"));
 
-            // Manejo de imagen
-            try {
-                Uri imageUri = Uri.parse(cliente.get("imagenPath"));
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                clienteImageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
+            // Manejo de la imagen
+            if (cliente.get("imagenPath").equals("default")) {
+                // Si es "default", usar el drawable por defecto
+                clienteImageView.setImageResource(R.drawable.ic_person);
+            } else {
+                // Si no, cargar la imagen desde la URI
+                try {
+                    Uri imageUri = Uri.parse(cliente.get("imagenPath"));
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    clienteImageView.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
             // Botón Editar Cliente
@@ -292,12 +301,18 @@ public class PCliente extends AppCompatActivity {
         etNroTelefonoEditar.setText(cliente.get("nroTelefono"));
 
         // Manejar la imagen
-        try {
-            Uri imageUri = Uri.parse(cliente.get("imagenPath"));
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-            imgClienteEditar.setImageBitmap(bitmap);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (cliente.get("imagenPath").equals("default")) {
+            // Si es "default", mostrar la imagen por defecto
+            imgClienteEditar.setImageResource(R.drawable.ic_person);
+        } else {
+            // Si no, cargar la imagen desde la URI
+            try {
+                Uri imageUri = Uri.parse(cliente.get("imagenPath"));
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                imgClienteEditar.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         // Reemplazar la imagen si se hace clic en ella

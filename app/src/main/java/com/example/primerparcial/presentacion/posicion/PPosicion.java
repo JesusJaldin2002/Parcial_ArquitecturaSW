@@ -105,7 +105,7 @@ public class PPosicion extends AppCompatActivity {
         List<Map<String, String>> ubicaciones = nPosicion.obtenerUbicacionesPorCliente(idCliente);
 
         for (Map<String, String> ubicacion : ubicaciones) {
-            View ubicacionView = getLayoutInflater().inflate(R.layout.ubicacion_item, null);
+            View ubicacionView = getLayoutInflater().inflate(R.layout.item_ubicacion, null);
 
             // Asignar los valores de la ubicación
             TextView idTextView = ubicacionView.findViewById(R.id.tvIdUbicacion);

@@ -92,11 +92,24 @@
         android:id="@+id/btnCatalogo"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:text="Gestionar Catálogo"
+        android:text="Gestionar Catálogos"
         android:backgroundTint="@color/primary_color"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/btnOrden"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnRepartidor"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="Gestionar Repartidores"
+        android:backgroundTint="@color/secondary_color"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/btnCatalogo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />

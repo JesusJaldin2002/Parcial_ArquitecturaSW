@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "appDB.db";
+    private static final String DATABASE_NAME = "primerparcial.db";
     private static final int DATABASE_VERSION = 1;
 
     public DBHelper(Context context) {
@@ -19,6 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL(crearTablaCategorias);
         db.execSQL(crearTablaPosiciones);
         db.execSQL(crearTablaProductos);
+        db.execSQL(crearTablaRepartidores);
 
     }
 
@@ -28,6 +29,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS categorias");
         db.execSQL("DROP TABLE IF EXISTS posiciones");
         db.execSQL("DROP TABLE IF EXISTS productos");
+        db.execSQL("DROP TABLE IF EXISTS repartidores");
 
         onCreate(db);
     }
@@ -62,4 +64,8 @@ public class DBHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(idCategoria) REFERENCES categorias(id)" +
             ");";
 
+    private static final String crearTablaRepartidores = "CREATE TABLE repartidores (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+            "nombre TEXT NOT NULL, " +
+            "nroTelefono TEXT NOT NULL)";
 }

@@ -43,6 +43,11 @@
             android:name=".presentacion.producto.PProducto"
             android:label="Primer Parcial - Productos"
             android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.repartidor.PRepartidor"
+            android:label="Primer Parcial - Repartidores"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 

@@ -28,10 +28,6 @@ public class PCategoria extends AppCompatActivity {
     private View gestionarCategoriaView;
     private View listarCategoriasView;
 
-    // Variables para guardar categoría y diálogo que están siendo editados
-    private Map<String, String> categoriaEnEdicion;
-    private Dialog dialogEnEdicion;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +81,7 @@ public class PCategoria extends AppCompatActivity {
         List<Map<String, String>> categorias = nCategoria.obtenerCategorias();
 
         for (Map<String, String> categoria : categorias) {
-            View categoriaView = getLayoutInflater().inflate(R.layout.categoria_item, null);
+            View categoriaView = getLayoutInflater().inflate(R.layout.item_categoria, null);
 
             // Asigna los valores a las vistas
             TextView idTextView = categoriaView.findViewById(R.id.tvIdCategoria);

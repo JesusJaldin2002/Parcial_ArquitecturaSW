@@ -10,7 +10,6 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -240,7 +239,7 @@ public class PProducto extends AppCompatActivity {
 
             for (Map<String, String> producto : productos) {
                 // Inflar la vista del producto
-                View productoView = getLayoutInflater().inflate(R.layout.producto_item, null);
+                View productoView = getLayoutInflater().inflate(R.layout.item_producto, null);
 
                 TextView idTextView = productoView.findViewById(R.id.tvIdProducto);
                 TextView nombreTextView = productoView.findViewById(R.id.tvNombreProducto);
