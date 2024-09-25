@@ -54,4 +54,9 @@ public class NCliente {
     public void eliminarCliente(String id) {
         dCliente.eliminarCliente(id);
     }
+
+    // Método para obtener el nombre del cliente por su ID
+    public String obtenerNombreClientePorId(int idCliente) {
+        return dCliente.obtenerNombreClientePorId(idCliente);
+    }
 }

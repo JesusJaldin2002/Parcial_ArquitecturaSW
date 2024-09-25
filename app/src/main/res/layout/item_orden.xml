@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/rounded_border">
+
+    <!-- Información de la orden -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- ID de la Orden -->
+        <TextView
+            android:id="@+id/tvIdOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID: 1"
+            android:textStyle="bold"
+            android:textSize="16sp" />
+
+        <!-- Fecha de la Orden -->
+        <TextView
+            android:id="@+id/tvFechaOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha: 2024-09-26"
+            android:fontFamily="sans-serif-black"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Estado de la Orden -->
+        <TextView
+            android:id="@+id/tvEstadoOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado: Pendiente"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Total de la Orden -->
+        <TextView
+            android:id="@+id/tvTotalOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: Bs 100.00"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Nombre del Cliente -->
+        <TextView
+            android:id="@+id/tvClienteOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cliente: Juan Pérez"
+            android:fontFamily="sans-serif-black"
+            android:textSize="16sp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <!-- Botones de acción: Fila 1 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/btnEditarOrden"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Editar"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnEliminarOrden"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Eliminar"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Botones de acción: Fila 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:id="@+id/btnVerDetallesOrden"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Detalle"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btnAnadirProductoOrden"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Añadir Producto"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>

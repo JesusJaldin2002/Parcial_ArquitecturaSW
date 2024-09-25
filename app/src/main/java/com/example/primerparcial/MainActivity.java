@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.primerparcial.datos.DBHelper;
 import com.example.primerparcial.presentacion.categoria.PCategoria;
 import com.example.primerparcial.presentacion.cliente.PCliente;
+import com.example.primerparcial.presentacion.orden.POrden;
 import com.example.primerparcial.presentacion.producto.PProducto;
 import com.example.primerparcial.presentacion.repartidor.PRepartidor;
 
@@ -40,6 +41,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button btnOrden = findViewById(R.id.btnOrden);
+        btnOrden.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, POrden.class);
+            startActivity(intent);
+        });
+
         Button btnCatalogo = findViewById(R.id.btnCatalogo);
 
         Button btnRepartidor = findViewById(R.id.btnRepartidor);

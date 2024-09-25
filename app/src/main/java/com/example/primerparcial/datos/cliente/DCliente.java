@@ -105,4 +105,19 @@ public class DCliente {
         db.delete("clientes", "id=?", new String[]{id});
         db.close();
     }
+
+    // Método para obtener el nombre del cliente por ID
+    public String obtenerNombreClientePorId(int idCliente) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String nombreCliente = null;
+
+        Cursor cursor = db.rawQuery("SELECT nombre FROM clientes WHERE id = ?", new String[]{String.valueOf(idCliente)});
+        if (cursor.moveToFirst()) {
+            nombreCliente = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
+        }
+        cursor.close();
+        db.close();
+
+        return nombreCliente;
+    }
 }

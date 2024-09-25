@@ -38,6 +38,7 @@
             android:layout_weight="1"
             android:background="@color/secondary_color"
             android:padding="8dp"
+            android:backgroundTint="@color/secondary_color"
             android:text="Cancelar"
             android:textColor="@android:color/white" />
 
