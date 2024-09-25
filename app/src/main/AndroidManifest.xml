@@ -38,6 +38,11 @@
             android:name=".presentacion.categoria.PCategoria"
             android:label="Primer Parcial - Categorías"
             android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.producto.PProducto"
+            android:label="Primer Parcial - Productos"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 

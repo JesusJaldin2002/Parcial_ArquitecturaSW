@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Formulario de registro de producto -->
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <!-- Título -->
+            <TextView
+                android:id="@+id/tvRegistrarProducto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:fontFamily="sans-serif-black"
+                android:text="Registrar Producto"
+                android:textColor="@color/black"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- Imagen del producto -->
+            <ImageView
+                android:id="@+id/imgProducto"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="24dp"
+                android:elevation="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_add_photo" />
+
+            <!-- Nombre del producto -->
+            <EditText
+                android:id="@+id/etNombreProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Nombre del Producto"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <!-- Descripción del producto -->
+            <EditText
+                android:id="@+id/etDescripcionProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Descripción"
+                android:inputType="text"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <!-- Precio del producto -->
+            <EditText
+                android:id="@+id/etPrecioProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Precio"
+                android:inputType="numberDecimal"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <!-- Stock del producto -->
+            <EditText
+                android:id="@+id/etStockProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/edittext_background"
+                android:hint="Stock"
+                android:inputType="number"
+                android:padding="12dp"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Categoría:"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Seleccionar categoría (Spinner) -->
+            <Spinner
+                android:id="@+id/spinnerCategoria"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/edittext_background" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="32dp">
+
+            <Button
+                android:id="@+id/btnRegistrarProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Agregar Producto"
+                android:backgroundTint="@color/primary_color"
+                android:textColor="@android:color/white"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnListarProductos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Listar Productos"
+                android:backgroundTint="@color/secondary_color"
+                android:textColor="@android:color/white"
+                android:padding="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnCancelarProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Volver atrás"
+                android:backgroundTint="@color/secondary_color"
+                android:textColor="@android:color/white"
+                android:padding="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.primerparcial.datos.DBHelper;
 import com.example.primerparcial.presentacion.categoria.PCategoria;
 import com.example.primerparcial.presentacion.cliente.PCliente;
+import com.example.primerparcial.presentacion.producto.PProducto;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button btnProducto = findViewById(R.id.btnProducto);
+        btnProducto.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, PProducto.class);
+            startActivity(intent);
+        });
 
         Button btnOrden = findViewById(R.id.btnOrden);
         Button btnCatalogo = findViewById(R.id.btnCatalogo);
