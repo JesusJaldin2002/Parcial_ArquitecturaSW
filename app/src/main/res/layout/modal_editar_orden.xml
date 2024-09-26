@@ -16,30 +16,24 @@
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Formato: dd/mm/yyyy"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="6dp"
+        android:layout_marginLeft="2dp"
+        />
+
     <!-- Fecha de la Orden -->
     <EditText
         android:id="@+id/etFechaOrdenEditar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
         android:hint="Fecha de la Orden"
-        android:padding="8dp"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Estado de la Orden -->
-    <EditText
-        android:id="@+id/etEstadoOrdenEditar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Estado de la Orden"
-        android:padding="8dp"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Total de la Orden -->
-    <EditText
-        android:id="@+id/etTotalOrdenEditar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Total"
         android:padding="8dp"
         android:layout_marginBottom="16dp" />
 
@@ -54,22 +48,6 @@
 
     <Spinner
         android:id="@+id/spinnerClienteEditar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edittext_background"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Spinner para seleccionar repartidor -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Repartidor:"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
-
-    <Spinner
-        android:id="@+id/spinnerRepartidorEditar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/edittext_background"

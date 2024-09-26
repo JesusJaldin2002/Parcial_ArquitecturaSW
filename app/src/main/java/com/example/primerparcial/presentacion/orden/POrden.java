@@ -1,8 +1,12 @@
 package com.example.primerparcial.presentacion.orden;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -10,22 +14,28 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.primerparcial.MainActivity;
 import com.example.primerparcial.R;
+import com.example.primerparcial.negocio.categoria.NCategoria;
 import com.example.primerparcial.negocio.cliente.NCliente;
+import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
 import com.example.primerparcial.negocio.orden.NOrden;
-import com.example.primerparcial.negocio.repartidor.NRepartidor;
+import com.example.primerparcial.negocio.producto.NProducto;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,37 +45,38 @@ public class POrden extends AppCompatActivity {
 
     private NOrden nOrden;
     private NCliente nCliente;
-    private NRepartidor nRepartidor;
+    private NProducto nProducto;
+    private NCategoria nCategoria;
+    private NDetalleOrden nDetalleOrden;
 
-    private EditText etFechaOrden, etEstadoOrden, etTotalOrden;
-    private Spinner spinnerCliente, spinnerRepartidor;
-    private int idClienteSeleccionado, idRepartidorSeleccionado;
-    private View gestionarOrdenView;
-    private View listarOrdenesView;
+    private EditText etFechaOrden, etCantidad, etPrecio;
+    private Spinner spinnerCliente, spinnerCategoria, spinnerProducto;
+    private ImageView ivImagenProducto;
+    private int idClienteSeleccionado;
+    private View gestionarOrdenView, listarOrdenesView, anadirProductoView;
+    private int idOrdenSeleccionada;
+    private List<Map<String, String>> productosDisponibles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Inflar ambos layouts
         gestionarOrdenView = getLayoutInflater().inflate(R.layout.activity_gestionar_orden, null);
         listarOrdenesView = getLayoutInflater().inflate(R.layout.lista_ordenes, null);
+        anadirProductoView = getLayoutInflater().inflate(R.layout.anadir_producto, null);
 
-        // Inicialmente, mostrar la vista de gestionar órdenes
         setContentView(gestionarOrdenView);
 
         nOrden = new NOrden(this);
         nCliente = new NCliente(this);
-        nRepartidor = new NRepartidor(this);
+        nProducto = new NProducto(this);
+        nCategoria = new NCategoria(this);
+        nDetalleOrden = new NDetalleOrden(this);
 
         etFechaOrden = findViewById(R.id.etFechaOrden);
-        etEstadoOrden = findViewById(R.id.etEstadoOrden);
-        etTotalOrden = findViewById(R.id.etTotalOrden);
+        etFechaOrden.setOnClickListener(v -> showDatePickerDialog());
         spinnerCliente = findViewById(R.id.spinnerCliente);
-        spinnerRepartidor = findViewById(R.id.spinnerRepartidor);
 
-        // Cargar los datos en los Spinners
         cargarClientes();
-        cargarRepartidores();
 
         Button btnRegistrar = findViewById(R.id.btnRegistrarOrden);
         btnRegistrar.setOnClickListener(v -> registrarOrden());
@@ -74,50 +85,300 @@ public class POrden extends AppCompatActivity {
         btnListarOrdenes.setOnClickListener(v -> listarOrdenes());
 
         Button btnVolver = findViewById(R.id.btnCancelarOrden);
-        btnVolver.setOnClickListener(v -> {
-            Intent intent = new Intent(POrden.this, MainActivity.class);
-            startActivity(intent);
-        });
+        btnVolver.setOnClickListener(v -> startActivity(new Intent(POrden.this, MainActivity.class)));
     }
 
-    // Método para registrar una nueva orden
-    private void registrarOrden() {
-        String fecha = etFechaOrden.getText().toString();
-        String estado = etEstadoOrden.getText().toString();
-        String total = etTotalOrden.getText().toString();
-
-        if (!fecha.isEmpty() && !estado.isEmpty()) {
-            // Verificar si el campo total está vacío y asignar 0 si es el caso
-            double totalOrden = total.isEmpty() ? 0.0 : Double.parseDouble(total);
-
-            if (isValidDate(fecha)) {
-                nOrden.registrarOrden(fecha, estado, totalOrden, idClienteSeleccionado, idRepartidorSeleccionado);
-                Toast.makeText(this, "Orden registrada", Toast.LENGTH_SHORT).show();
-
-                // Limpiar los campos después de registrar
-                etFechaOrden.setText("");
-                etEstadoOrden.setText("");
-                etTotalOrden.setText("0");  // Restablecer el valor total a 0
-            } else {
-                Toast.makeText(this, "Por favor, ingrese una fecha válida en el formato dd/MM/yyyy", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
-        }
+    // Manejo de las fechas
+    private void showDatePickerDialog() {
+        final Calendar calendario = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                (view, year, monthOfYear, dayOfMonth) -> etFechaOrden.setText(String.format("%02d/%02d/%04d", dayOfMonth, monthOfYear + 1, year)),
+                calendario.get(Calendar.YEAR), calendario.get(Calendar.MONTH), calendario.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.show();
     }
 
     private boolean isValidDate(String dateStr) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
         try {
-            Date date = sdf.parse(dateStr);
+            sdf.parse(dateStr);
             return true;
         } catch (ParseException e) {
             return false;
         }
     }
 
-    // Método para cargar los clientes en el Spinner
+    // Métodos para manejar el registro y la visualización de órdenes
+    private void registrarOrden() {
+        String fecha = etFechaOrden.getText().toString();
+        String estado = "Pendiente";
+        double totalOrden = 0.0;
+
+        if (!fecha.isEmpty() && isValidDate(fecha)) {
+            nOrden.registrarOrden(fecha, estado, totalOrden, idClienteSeleccionado, -1);
+            Toast.makeText(this, "Orden registrada", Toast.LENGTH_SHORT).show();
+            etFechaOrden.setText("");
+        } else {
+            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void listarOrdenes() {
+        setContentView(listarOrdenesView);
+        LinearLayout listaOrdenesLayout = findViewById(R.id.listaOrdenesLayout);
+        listaOrdenesLayout.removeAllViews();
+        List<Map<String, String>> ordenes = nOrden.obtenerOrdenes();
+
+        for (Map<String, String> orden : ordenes) {
+            View ordenView = getLayoutInflater().inflate(R.layout.item_orden, null);
+
+            TextView idTextView = ordenView.findViewById(R.id.tvIdOrden);
+            TextView fechaTextView = ordenView.findViewById(R.id.tvFechaOrden);
+            TextView estadoTextView = ordenView.findViewById(R.id.tvEstadoOrden);
+            TextView totalTextView = ordenView.findViewById(R.id.tvTotalOrden);
+            TextView clienteTextView = ordenView.findViewById(R.id.tvClienteOrden);
+
+            idTextView.setText("ID: " + orden.get("id"));
+            fechaTextView.setText("Fecha: " + orden.get("fecha"));
+            String estadoOrden = orden.get("estado");
+            estadoTextView.setText("Estado: " + estadoOrden);
+
+            if ("Pendiente".equals(estadoOrden)) {
+                estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.red));
+            } else if ("Completado".equals(estadoOrden)) {
+                estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.green));
+            } else {
+                estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.black));
+            }
+            totalTextView.setText("Total: Bs " + orden.get("total"));
+
+            int idCliente = Integer.parseInt(orden.get("idCliente"));
+            String nombreCliente = nCliente.obtenerNombreClientePorId(idCliente);
+            clienteTextView.setText("Cliente: " + nombreCliente);
+
+            manejarBotonesAdicionales(ordenView, orden);
+            listaOrdenesLayout.addView(ordenView);
+        }
+
+        Button btnVolver = listarOrdenesView.findViewById(R.id.btnVolver);
+        btnVolver.setOnClickListener(v -> setContentView(gestionarOrdenView));
+    }
+
+    // Manejo de los botones en las vistas de orden
+    private void manejarBotonesAdicionales(View ordenView, Map<String, String> orden) {
+        Button btnEditarOrden = ordenView.findViewById(R.id.btnEditarOrden);
+        Button btnEliminarOrden = ordenView.findViewById(R.id.btnEliminarOrden);
+        Button btnVerDetallesOrden = ordenView.findViewById(R.id.btnVerDetallesOrden);
+        Button btnAgregarProducto = ordenView.findViewById(R.id.btnAnadirProductoOrden);
+        Button btnActualizarEstado = ordenView.findViewById(R.id.btnActualizarEstado);
+
+        btnEditarOrden.setOnClickListener(v -> mostrarModalEditarOrden(orden));
+        btnEliminarOrden.setOnClickListener(v -> eliminarOrdenConConfirmacion(orden.get("id")));
+        btnVerDetallesOrden.setOnClickListener(v -> verDetallesOrden(orden));
+        btnAgregarProducto.setOnClickListener(v -> agregarProductoAOrden(orden));
+        btnActualizarEstado.setOnClickListener(v -> actualizarEstadoOrden(orden.get("id")));
+    }
+
+    private void mostrarModalEditarOrden(Map<String, String> orden) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.modal_editar_orden);
+
+        EditText etFechaEditar = dialog.findViewById(R.id.etFechaOrdenEditar);
+        Spinner spinnerClienteEditar = dialog.findViewById(R.id.spinnerClienteEditar);
+
+        etFechaEditar.setText(orden.get("fecha"));
+        cargarClientesEditar(spinnerClienteEditar, orden.get("idCliente"));
+
+        Button btnGuardarEditar = dialog.findViewById(R.id.btnGuardarOrdenEditar);
+        btnGuardarEditar.setOnClickListener(v -> {
+            String nuevaFecha = etFechaEditar.getText().toString();
+            if (!nuevaFecha.isEmpty() && isValidDate(nuevaFecha)) {
+                nOrden.actualizarOrden(Integer.parseInt(orden.get("id")), nuevaFecha, "Pendiente", 0.0, idClienteSeleccionado, Integer.parseInt(orden.get("idRepartidor")));
+                Toast.makeText(POrden.this, "Orden actualizada", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                listarOrdenes();
+            } else {
+                Toast.makeText(POrden.this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
+    private void eliminarOrdenConConfirmacion(String idOrden) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_confirmar_eliminar);
+        Button btnSi = dialog.findViewById(R.id.btnSi);
+        btnSi.setOnClickListener(v -> {
+            nOrden.eliminarOrden(Integer.parseInt(idOrden));
+            Toast.makeText(this, "Orden eliminada", Toast.LENGTH_SHORT).show();
+            listarOrdenes();
+            dialog.dismiss();
+        });
+
+        Button btnNo = dialog.findViewById(R.id.btnNo);
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    // Métodos para agregar productos a una orden
+    private void mostrarAnadirProductoView(int idOrden) {
+        setContentView(anadirProductoView);
+        idOrdenSeleccionada = idOrden;
+
+        spinnerCategoria = findViewById(R.id.spinnerCategoria);
+        spinnerProducto = findViewById(R.id.spinnerProducto);
+        etCantidad = findViewById(R.id.etCantidad);
+        etPrecio = findViewById(R.id.etPrecio);
+        ivImagenProducto = findViewById(R.id.ivImagenProducto);
+
+        // Cargar categorías en el spinner
+        cargarCategorias();
+
+        Button btnAnadirProducto = findViewById(R.id.btnAnadirProducto);
+        btnAnadirProducto.setOnClickListener(v -> {
+            String cantidadStr = etCantidad.getText().toString();
+            String precioStr = etPrecio.getText().toString();
+
+            if (cantidadStr.isEmpty() || precioStr.isEmpty()) {
+                Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int cantidad = Integer.parseInt(cantidadStr);
+            double precio = Double.parseDouble(precioStr);
+            int posicionSeleccionada = spinnerProducto.getSelectedItemPosition();
+            Map<String, String> productoSeleccionado = productosDisponibles.get(posicionSeleccionada);
+            int idProducto = Integer.parseInt(productoSeleccionado.get("id"));
+            int stockDisponible = Integer.parseInt(productoSeleccionado.get("stock"));
+
+            // Validar que la cantidad no sea mayor al stock disponible
+            if (cantidad > stockDisponible) {
+                Toast.makeText(this, "La cantidad no puede ser mayor al stock disponible", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Validar que la cantidad no sea 0
+            if (cantidad == 0) {
+                Toast.makeText(this, "La cantidad debe ser mayor a 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Verificar si el producto ya existe en la orden
+            if (nDetalleOrden.verificarProductoEnOrden(idOrdenSeleccionada, idProducto)) {
+                Toast.makeText(this, "El producto ya está en la orden", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Insertar el detalle de la orden
+            nDetalleOrden.registrarDetalleOrden(cantidad, precio, idOrdenSeleccionada, idProducto);
+
+            // Reducir el stock del producto
+            int nuevoStock = stockDisponible - cantidad;
+            nProducto.actualizarStock(idProducto, nuevoStock);
+
+            Toast.makeText(this, "Producto añadido a la orden", Toast.LENGTH_SHORT).show();
+
+            // Limpiar los campos para permitir agregar otro producto
+            etCantidad.setText("");
+            etPrecio.setText("");
+            ivImagenProducto.setImageBitmap(null);
+            spinnerCategoria.setSelection(0);
+        });
+
+        Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
+        btnVolverAtras.setOnClickListener(v -> listarOrdenes());
+    }
+
+    private void cargarCategorias() {
+        List<Map<String, String>> categorias = nCategoria.obtenerCategorias();
+        List<String> nombresCategorias = new ArrayList<>();
+        for (Map<String, String> categoria : categorias) {
+            nombresCategorias.add(categoria.get("nombre"));
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombresCategorias);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategoria.setAdapter(adapter);
+
+        spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                cargarProductosPorCategoria(nombresCategorias.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void cargarProductosPorCategoria(String categoriaSeleccionada) {
+        Map<String, List<Map<String, String>>> productosPorCategoria = nProducto.obtenerProductosPorCategoria();
+        productosDisponibles = productosPorCategoria.get(categoriaSeleccionada);  // Guardar productos disponibles
+
+        // Crear una lista personalizada con nombre y precio
+        List<String> productosDisplay = new ArrayList<>();
+        for (Map<String, String> producto : productosDisponibles) {
+            String nombreProducto = producto.get("nombre");
+            String precioProducto = producto.get("precio");
+            productosDisplay.add(nombreProducto + " - " + precioProducto + " Bs");
+        }
+
+        // Crear un ArrayAdapter con la lista personalizada
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, productosDisplay);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerProducto.setAdapter(adapter);
+
+        // Manejar selección de producto para mostrar imagen, precio y stock
+        spinnerProducto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Map<String, String> productoSeleccionado = productosDisponibles.get(position);  // Obtener el producto desde la lista
+
+                // Mostrar el precio en el campo de precio
+                etPrecio.setText(productoSeleccionado.get("precio"));
+
+                // Mostrar el stock en el TextView
+                TextView tvStockProducto = findViewById(R.id.tvStockProducto);
+                tvStockProducto.setText("Stock disponible: " + productoSeleccionado.get("stock"));
+
+                // Cargar y mostrar la imagen del producto
+                String imagenPath = productoSeleccionado.get("imagenPath");
+                try {
+                    Uri imageUri = Uri.parse(imagenPath);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    ivImagenProducto.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No hacer nada
+            }
+        });
+    }
+
+    // Otros métodos relacionados con órdenes
+    private void agregarProductoAOrden(Map<String, String> orden) {
+        mostrarAnadirProductoView(Integer.parseInt(Objects.requireNonNull(orden.get("id"))));
+    }
+
+    private void verDetallesOrden(Map<String, String> orden) {
+        Toast.makeText(this, "Detalles de la orden: " + orden.get("id"), Toast.LENGTH_SHORT).show();
+    }
+
+    private void actualizarEstadoOrden(String idOrden) {
+        Toast.makeText(this, "Función de actualizar estado no implementada aún", Toast.LENGTH_SHORT).show();
+    }
+
+    // Cargar clientes en el spinner
     private void cargarClientes() {
         List<Map<String, String>> clientes = nCliente.obtenerClientes();
         List<String> nombresClientes = new ArrayList<>();
@@ -129,7 +390,6 @@ public class POrden extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCliente.setAdapter(adapter);
 
-        // Manejar la selección del Spinner
         spinnerCliente.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -137,144 +397,10 @@ public class POrden extends AppCompatActivity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No hacer nada
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
-    // Método para cargar los repartidores en el Spinner
-    private void cargarRepartidores() {
-        List<Map<String, String>> repartidores = nRepartidor.obtenerRepartidores();
-        List<String> nombresRepartidores = new ArrayList<>();
-        for (Map<String, String> repartidor : repartidores) {
-            nombresRepartidores.add(repartidor.get("nombre"));
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombresRepartidores);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerRepartidor.setAdapter(adapter);
-
-        // Manejar la selección del Spinner
-        spinnerRepartidor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                idRepartidorSeleccionado = Integer.parseInt(Objects.requireNonNull(repartidores.get(position).get("id")));
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No hacer nada
-            }
-        });
-    }
-
-    // Método para listar órdenes
-    private void listarOrdenes() {
-        setContentView(listarOrdenesView);
-
-        LinearLayout listaOrdenesLayout = findViewById(R.id.listaOrdenesLayout);
-        listaOrdenesLayout.removeAllViews();
-
-        // Obtener las órdenes desde la capa de negocio
-        List<Map<String, String>> ordenes = nOrden.obtenerOrdenes();
-
-        for (Map<String, String> orden : ordenes) {
-            View ordenView = getLayoutInflater().inflate(R.layout.item_orden, null);
-
-            // Asignar los valores a las vistas
-            TextView idTextView = ordenView.findViewById(R.id.tvIdOrden);
-            TextView fechaTextView = ordenView.findViewById(R.id.tvFechaOrden);
-            TextView estadoTextView = ordenView.findViewById(R.id.tvEstadoOrden);
-            TextView totalTextView = ordenView.findViewById(R.id.tvTotalOrden);
-            TextView clienteTextView = ordenView.findViewById(R.id.tvClienteOrden);
-
-            // Asignar valores obtenidos de la base de datos o el objeto orden
-            idTextView.setText("ID: " + orden.get("id"));
-            fechaTextView.setText("Fecha: " + orden.get("fecha"));
-            estadoTextView.setText("Estado: " + orden.get("estado"));
-            totalTextView.setText("Total: Bs " + orden.get("total"));
-
-            // Obtener el nombre del cliente usando el idCliente
-            int idCliente = Integer.parseInt(orden.get("idCliente"));
-            String nombreCliente = nCliente.obtenerNombreClientePorId(idCliente);
-            clienteTextView.setText("Cliente: " + nombreCliente);
-
-            // Manejar los botones adicionales para editar, eliminar, etc.
-            manejarBotonesAdicionales(ordenView, orden);
-
-            // Agregar la vista de orden a la lista
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            layoutParams.setMargins(0, 0, 0, 32);
-            ordenView.setLayoutParams(layoutParams);
-
-            listaOrdenesLayout.addView(ordenView);
-        }
-
-        // Botón para volver a la pantalla de gestionar órdenes
-        Button btnVolver = listarOrdenesView.findViewById(R.id.btnVolver);
-        btnVolver.setOnClickListener(v -> setContentView(gestionarOrdenView));
-    }
-
-    // Método para mostrar el modal de edición de una orden
-    private void mostrarModalEditarOrden(Map<String, String> orden) {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.modal_editar_orden);
-
-        // Inicializar las vistas del modal
-        EditText etFechaEditar = dialog.findViewById(R.id.etFechaOrdenEditar);
-        EditText etEstadoEditar = dialog.findViewById(R.id.etEstadoOrdenEditar);
-        EditText etTotalEditar = dialog.findViewById(R.id.etTotalOrdenEditar);
-        Spinner spinnerClienteEditar = dialog.findViewById(R.id.spinnerClienteEditar);
-        Spinner spinnerRepartidorEditar = dialog.findViewById(R.id.spinnerRepartidorEditar);
-
-        // Cargar los datos actuales de la orden en el modal
-        etFechaEditar.setText(orden.get("fecha"));
-        etEstadoEditar.setText(orden.get("estado"));
-        etTotalEditar.setText(orden.get("total"));
-
-        // Cargar clientes y repartidores en los Spinners
-        cargarClientesEditar(spinnerClienteEditar, orden.get("idCliente"));
-        cargarRepartidoresEditar(spinnerRepartidorEditar, orden.get("idRepartidor"));
-
-        // Botón Cancelar
-        Button btnCancelarEditar = dialog.findViewById(R.id.btnCancelarOrdenEditar);
-        btnCancelarEditar.setOnClickListener(v -> dialog.dismiss());
-
-        // Botón Guardar
-        Button btnGuardarEditar = dialog.findViewById(R.id.btnGuardarOrdenEditar);
-        btnGuardarEditar.setOnClickListener(v -> {
-            String nuevaFecha = etFechaEditar.getText().toString();
-            String nuevoEstado = etEstadoEditar.getText().toString();
-            String nuevoTotalStr = etTotalEditar.getText().toString();
-
-            if (!nuevaFecha.isEmpty() && !nuevoEstado.isEmpty() && !nuevoTotalStr.isEmpty()) {
-                double nuevoTotal = Double.parseDouble(nuevoTotalStr);
-                int idOrden = Integer.parseInt(orden.get("id"));
-
-                // Llamar a la capa de negocio para actualizar la orden
-                nOrden.actualizarOrden(idOrden, nuevaFecha, nuevoEstado, nuevoTotal, idClienteSeleccionado, idRepartidorSeleccionado);
-                Toast.makeText(POrden.this, "Orden actualizada", Toast.LENGTH_SHORT).show();
-                dialog.dismiss();
-                listarOrdenes(); // Refrescar la lista de órdenes
-            } else {
-                Toast.makeText(POrden.this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        dialog.show();
-
-        // Aquí ajustamos el tamaño del modal
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        }
-    }
-
-    // Método para cargar clientes en el spinner de edición
     private void cargarClientesEditar(Spinner spinner, String idClienteActual) {
         List<Map<String, String>> clientes = nCliente.obtenerClientes();
         List<String> nombresClientes = new ArrayList<>();
@@ -289,13 +415,11 @@ public class POrden extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        // Seleccionar el cliente actual en el Spinner
         int clientePosition = idsClientes.indexOf(Integer.parseInt(idClienteActual));
         if (clientePosition >= 0) {
             spinner.setSelection(clientePosition);
         }
 
-        // Almacenar la nueva selección del cliente
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -303,96 +427,7 @@ public class POrden extends AppCompatActivity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No hacer nada
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
-
-    // Método para cargar repartidores en el spinner de edición
-    private void cargarRepartidoresEditar(Spinner spinner, String idRepartidorActual) {
-        List<Map<String, String>> repartidores = nRepartidor.obtenerRepartidores();
-        List<String> nombresRepartidores = new ArrayList<>();
-        List<Integer> idsRepartidores = new ArrayList<>();
-
-        for (Map<String, String> repartidor : repartidores) {
-            nombresRepartidores.add(repartidor.get("nombre"));
-            idsRepartidores.add(Integer.parseInt(repartidor.get("id")));
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombresRepartidores);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        // Seleccionar el repartidor actual en el Spinner
-        int repartidorPosition = idsRepartidores.indexOf(Integer.parseInt(idRepartidorActual));
-        if (repartidorPosition >= 0) {
-            spinner.setSelection(repartidorPosition);
-        }
-
-        // Almacenar la nueva selección del repartidor
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                idRepartidorSeleccionado = idsRepartidores.get(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // No hacer nada
-            }
-        });
-    }
-
-    // Método para manejar la eliminación de una orden
-    private void eliminarOrdenConConfirmacion(String idOrden) {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_confirmar_eliminar);
-
-        TextView tvTitulo = dialog.findViewById(R.id.tvTitulo);
-        TextView tvMensaje = dialog.findViewById(R.id.tvMensaje);
-        tvTitulo.setText("Eliminar Orden");
-        tvMensaje.setText("¿Estás seguro de que quieres eliminar esta orden?");
-
-        Button btnSi = dialog.findViewById(R.id.btnSi);
-        btnSi.setOnClickListener(v -> {
-            nOrden.eliminarOrden(Integer.parseInt(idOrden));
-            Toast.makeText(this, "Orden eliminada", Toast.LENGTH_SHORT).show();
-            listarOrdenes();
-            dialog.dismiss();
-        });
-
-        Button btnNo = dialog.findViewById(R.id.btnNo);
-        btnNo.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-    }
-
-    // Método para manejar el botón de agregar productos a la orden
-    private void agregarProductoAOrden(Map<String, String> orden) {
-        // Aquí puedes implementar la lógica para agregar productos a una orden
-        // Podrías abrir un modal o una nueva pantalla para seleccionar productos y agregarlos a la orden
-        Toast.makeText(this, "Función de agregar productos no implementada aún", Toast.LENGTH_SHORT).show();
-    }
-
-    // Método para ver detalles de la orden
-    private void verDetallesOrden(Map<String, String> orden) {
-        // Aquí puedes implementar la lógica para ver los detalles de la orden
-        Toast.makeText(this, "Detalles de la orden: " + orden.get("id"), Toast.LENGTH_SHORT).show();
-    }
-
-    // Método para crear los botones adicionales y asignarles funcionalidad
-    private void manejarBotonesAdicionales(View ordenView, Map<String, String> orden) {
-        Button btnEditarOrden = ordenView.findViewById(R.id.btnEditarOrden);
-        Button btnEliminarOrden = ordenView.findViewById(R.id.btnEliminarOrden);
-        Button btnVerDetallesOrden = ordenView.findViewById(R.id.btnVerDetallesOrden);
-        Button btnAgregarProducto = ordenView.findViewById(R.id.btnAnadirProductoOrden); // Puedes cambiar el nombre a btnAgregarProducto si es más claro
-
-        // Asignar acciones a los botones
-        btnEditarOrden.setOnClickListener(v -> mostrarModalEditarOrden(orden));
-        btnEliminarOrden.setOnClickListener(v -> eliminarOrdenConConfirmacion(orden.get("id")));
-        btnVerDetallesOrden.setOnClickListener(v -> verDetallesOrden(orden));
-        btnAgregarProducto.setOnClickListener(v -> agregarProductoAOrden(orden));
-    }
-
 }

@@ -132,4 +132,32 @@ public class DOrden {
         db.delete("ordenes", "id=?", new String[]{String.valueOf(id)});
         db.close();
     }
+
+    // Método para actualizar el total de la orden
+    public void actualizarTotalOrden(int idOrden, double totalDetalle, boolean isAdding) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Obtener el total actual de la orden
+        String query = "SELECT total FROM ordenes WHERE id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idOrden)});
+        double totalActual = 0.0;
+        if (cursor.moveToFirst()) {
+            totalActual = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+        }
+        cursor.close();
+
+        // Calcular el nuevo total
+        double nuevoTotal;
+        if (isAdding) {
+            nuevoTotal = totalActual + totalDetalle;
+        } else {
+            nuevoTotal = totalActual - totalDetalle;
+        }
+
+        // Actualizar el total de la orden
+        ContentValues values = new ContentValues();
+        values.put("total", nuevoTotal);
+        db.update("ordenes", values, "id = ?", new String[]{String.valueOf(idOrden)});
+        db.close();
+    }
 }

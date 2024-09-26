@@ -8,21 +8,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
         <!-- Título de la pantalla -->
         <TextView
             android:id="@+id/tvRegistrarOrden"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
             android:text="Registrar Orden"
             android:textColor="@color/black"
-            android:fontFamily="sans-serif-black"
             android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="32dp"
-            android:gravity="center" />
+            android:textStyle="bold" />
 
         <!-- Fecha de la orden -->
         <EditText
@@ -31,35 +31,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:background="@drawable/edittext_background"
+            android:clickable="true"
+            android:focusable="false"
             android:hint="Fecha de la Orden (dd/mm/yyyy)"
-            android:inputType="text"
-            android:padding="12dp"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-
-        <!-- Estado de la orden -->
-        <EditText
-            android:id="@+id/etEstadoOrden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edittext_background"
-            android:hint="Estado: Pendiente, Entregado"
-            android:inputType="text"
-            android:padding="12dp"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-
-        <!-- Total de la orden -->
-        <EditText
-            android:id="@+id/etTotalOrden"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/edittext_background"
-            android:hint="Total"
-            android:text="0"
-            android:inputType="numberDecimal"
             android:padding="12dp"
             android:textColor="@color/black"
             android:textSize="16sp" />
@@ -68,32 +42,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Cliente:"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/spinnerCliente"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginBottom="24dp"
-            android:background="@drawable/edittext_background" />
-
-        <!-- Repartidor -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Repartidor:"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <Spinner
-            android:id="@+id/spinnerRepartidor"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="30dp"
             android:background="@drawable/edittext_background" />
 
         <!-- Botones -->
@@ -101,29 +59,30 @@
             android:id="@+id/btnRegistrarOrden"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Agregar Orden"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/primary_color"
-            android:textColor="@android:color/white"
             android:padding="16dp"
-            android:layout_marginBottom="16dp" />
+            android:text="Agregar Orden"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btnListarOrdenes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Listar Órdenes"
+            android:layout_marginBottom="16dp"
             android:backgroundTint="@color/secondary_color"
-            android:textColor="@android:color/white"
             android:padding="16dp"
-            android:layout_marginBottom="16dp" />
+            android:text="Listar Órdenes"
+            android:textColor="@android:color/white" />
 
         <Button
             android:id="@+id/btnCancelarOrden"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Volver atrás"
             android:backgroundTint="@color/secondary_color"
-            android:textColor="@android:color/white"
-            android:padding="16dp" />
+            android:padding="16dp"
+            android:text="Volver atrás"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 </ScrollView>

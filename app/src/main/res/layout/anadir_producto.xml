@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/background_color">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTituloAnadirProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Añadir Producto"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"/>
+
+        <!-- Categoría -->
+        <TextView
+            android:id="@+id/tvCategoria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Categoría:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerCategoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:background="@drawable/edittext_background" />
+
+        <!-- Producto -->
+        <TextView
+            android:id="@+id/tvProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Producto:"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:background="@drawable/edittext_background" />
+
+        <!-- Stock del Producto -->
+        <TextView
+            android:id="@+id/tvStockProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stock disponible: "
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/black"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Cantidad -->
+        <EditText
+            android:id="@+id/etCantidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cantidad"
+            android:inputType="number"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edittext_background"
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
+
+        <!-- Precio -->
+        <EditText
+            android:id="@+id/etPrecio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Precio"
+            android:inputType="numberDecimal"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edittext_background"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <!-- Imagen del Producto -->
+        <ImageView
+            android:id="@+id/ivImagenProducto"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="Imagen del producto"
+            android:scaleType="centerCrop"
+            android:background="@color/white"/>
+
+        <!-- Botón Añadir Producto -->
+        <Button
+            android:id="@+id/btnAnadirProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Añadir Producto"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="5dp" />
+
+        <!-- Botón Volver Atrás -->
+        <Button
+            android:id="@+id/btnVolverAtras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver atrás"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+</ScrollView>

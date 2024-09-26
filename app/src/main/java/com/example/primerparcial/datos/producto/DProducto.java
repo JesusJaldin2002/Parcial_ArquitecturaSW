@@ -165,4 +165,17 @@ public class DProducto {
         db.update("productos", values, "id = ?", new String[]{String.valueOf(idProducto)});
         db.close();
     }
+
+    public int obtenerStockProducto(int idProducto) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT stock FROM productos WHERE id = ?", new String[]{String.valueOf(idProducto)});
+
+        if (cursor.moveToFirst()) {
+            int stock = cursor.getInt(cursor.getColumnIndexOrThrow("stock"));
+            cursor.close();
+            return stock;
+        }
+        cursor.close();
+        return 0; // Retornar 0 si no se encuentra el producto o no tiene stock
+    }
 }

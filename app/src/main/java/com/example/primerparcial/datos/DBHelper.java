@@ -82,9 +82,9 @@ public class DBHelper extends SQLiteOpenHelper {
             "estado TEXT NOT NULL, " +
             "total REAL NOT NULL, " +
             "idCliente INTEGER NOT NULL, " +
-            "idRepartidor INTEGER NOT NULL, " +
-            "FOREIGN KEY(idCliente) REFERENCES clientes(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-            "FOREIGN KEY(idRepartidor) REFERENCES repartidores(id) ON DELETE CASCADE ON UPDATE CASCADE);";
+            "idRepartidor INTEGER, " +
+            "FOREIGN KEY(idCliente) REFERENCES clientes(id), " +
+            "FOREIGN KEY(idRepartidor) REFERENCES repartidores(id));";
 
     private static final String crearTablaDetalleOrden = "CREATE TABLE detalleOrden (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -92,8 +92,8 @@ public class DBHelper extends SQLiteOpenHelper {
             "precio REAL NOT NULL, " +
             "idOrden INTEGER NOT NULL, " +
             "idProducto INTEGER NOT NULL, " +
-            "FOREIGN KEY(idOrden) REFERENCES ordenes(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-            "FOREIGN KEY(idProducto) REFERENCES productos(id) ON DELETE CASCADE ON UPDATE CASCADE);";
+            "FOREIGN KEY(idOrden) REFERENCES ordenes(id), " +
+            "FOREIGN KEY(idProducto) REFERENCES productos(id));";
 
     private static final String crearTablaCatalogos = "CREATE TABLE catalogos (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +

@@ -108,9 +108,20 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Añadir Producto"
+            android:text="Añadir Prod."
             android:backgroundTint="@color/primary_color"
             android:textColor="@android:color/white"
+            android:textSize="14sp"
             android:layout_marginStart="8dp" />
     </LinearLayout>
+
+    <!-- Botones de acción: Fila 3 - Actualizar Estado -->
+    <Button
+        android:id="@+id/btnActualizarEstado"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="ESTADO"
+        android:backgroundTint="@color/green_gray"
+        android:textColor="@android:color/white" />
 </LinearLayout>
