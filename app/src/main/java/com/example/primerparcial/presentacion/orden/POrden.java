@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,13 +31,14 @@ import com.example.primerparcial.negocio.cliente.NCliente;
 import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
 import com.example.primerparcial.negocio.orden.NOrden;
 import com.example.primerparcial.negocio.producto.NProducto;
+import com.example.primerparcial.negocio.repartidor.NRepartidor;
+import com.example.primerparcial.presentacion.detalleOrden.PDetalleOrden;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,14 +50,16 @@ public class POrden extends AppCompatActivity {
     private NProducto nProducto;
     private NCategoria nCategoria;
     private NDetalleOrden nDetalleOrden;
+    private NRepartidor nRepartidor;
 
     private EditText etFechaOrden, etCantidad, etPrecio;
-    private Spinner spinnerCliente, spinnerCategoria, spinnerProducto;
+    private Spinner spinnerCliente, spinnerCategoria, spinnerProducto, spinnerRepartidor;
     private ImageView ivImagenProducto;
     private int idClienteSeleccionado;
-    private View gestionarOrdenView, listarOrdenesView, anadirProductoView;
+    private View gestionarOrdenView, listarOrdenesView, anadirProductoView, actualizarEstadoView;
     private int idOrdenSeleccionada;
     private List<Map<String, String>> productosDisponibles;
+    private List<Map<String, String>> repartidoresDisponibles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,7 @@ public class POrden extends AppCompatActivity {
         gestionarOrdenView = getLayoutInflater().inflate(R.layout.activity_gestionar_orden, null);
         listarOrdenesView = getLayoutInflater().inflate(R.layout.lista_ordenes, null);
         anadirProductoView = getLayoutInflater().inflate(R.layout.anadir_producto, null);
+        actualizarEstadoView = getLayoutInflater().inflate(R.layout.actualizar_estado_orden, null);
 
         setContentView(gestionarOrdenView);
 
@@ -71,6 +76,7 @@ public class POrden extends AppCompatActivity {
         nProducto = new NProducto(this);
         nCategoria = new NCategoria(this);
         nDetalleOrden = new NDetalleOrden(this);
+        nRepartidor = new NRepartidor(this);
 
         etFechaOrden = findViewById(R.id.etFechaOrden);
         etFechaOrden.setOnClickListener(v -> showDatePickerDialog());
@@ -148,6 +154,8 @@ public class POrden extends AppCompatActivity {
                 estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.red));
             } else if ("Completado".equals(estadoOrden)) {
                 estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.green));
+            } else if ("Enviado".equals(estadoOrden)) {
+                estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.blue));
             } else {
                 estadoTextView.setTextColor(ContextCompat.getColor(this, R.color.black));
             }
@@ -158,6 +166,14 @@ public class POrden extends AppCompatActivity {
             clienteTextView.setText("Cliente: " + nombreCliente);
 
             manejarBotonesAdicionales(ordenView, orden);
+
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            layoutParams.setMargins(0, 0, 0, 32);
+            ordenView.setLayoutParams(layoutParams);
+
             listaOrdenesLayout.addView(ordenView);
         }
 
@@ -177,7 +193,7 @@ public class POrden extends AppCompatActivity {
         btnEliminarOrden.setOnClickListener(v -> eliminarOrdenConConfirmacion(orden.get("id")));
         btnVerDetallesOrden.setOnClickListener(v -> verDetallesOrden(orden));
         btnAgregarProducto.setOnClickListener(v -> agregarProductoAOrden(orden));
-        btnActualizarEstado.setOnClickListener(v -> actualizarEstadoOrden(orden.get("id")));
+        btnActualizarEstado.setOnClickListener(v -> mostrarActualizarEstadoView(orden.get("id")));
     }
 
     private void mostrarModalEditarOrden(Map<String, String> orden) {
@@ -282,6 +298,9 @@ public class POrden extends AppCompatActivity {
             int nuevoStock = stockDisponible - cantidad;
             nProducto.actualizarStock(idProducto, nuevoStock);
 
+            // Actualizar la lista de productos en el spinner
+            cargarProductosPorCategoria(spinnerCategoria.getSelectedItem().toString());
+
             Toast.makeText(this, "Producto añadido a la orden", Toast.LENGTH_SHORT).show();
 
             // Limpiar los campos para permitir agregar otro producto
@@ -290,6 +309,7 @@ public class POrden extends AppCompatActivity {
             ivImagenProducto.setImageBitmap(null);
             spinnerCategoria.setSelection(0);
         });
+
 
         Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
         btnVolverAtras.setOnClickListener(v -> listarOrdenes());
@@ -313,7 +333,8 @@ public class POrden extends AppCompatActivity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
     }
 
@@ -371,11 +392,71 @@ public class POrden extends AppCompatActivity {
     }
 
     private void verDetallesOrden(Map<String, String> orden) {
-        Toast.makeText(this, "Detalles de la orden: " + orden.get("id"), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(POrden.this, PDetalleOrden.class);
+        intent.putExtra("idOrden", Integer.parseInt(orden.get("id")));
+        startActivity(intent);
+    }
+
+    private void mostrarActualizarEstadoView(String idOrden) {
+        setContentView(actualizarEstadoView);
+        TextView tvestadoOrdenTitulo = findViewById(R.id.tvEstadoOrden);
+        tvestadoOrdenTitulo.setText("Estado de la Orden #" + idOrden);
+
+        spinnerRepartidor = findViewById(R.id.spinnerRepartidor);
+        cargarRepartidores();
+
+        // Obtener el botón para actualizar el estado
+        Button btnActualizarEstado = findViewById(R.id.btnActualizarEstado);
+        btnActualizarEstado.setOnClickListener(v -> actualizarEstadoOrden(idOrden));
+
+        // Botón para volver atrás
+        Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
+        btnVolverAtras.setOnClickListener(v -> listarOrdenes());
     }
 
     private void actualizarEstadoOrden(String idOrden) {
-        Toast.makeText(this, "Función de actualizar estado no implementada aún", Toast.LENGTH_SHORT).show();
+        // Obtener el estado seleccionado
+        RadioGroup radioGroupEstado = findViewById(R.id.radioGroupEstado);
+        int estadoSeleccionadoId = radioGroupEstado.getCheckedRadioButtonId();
+        String nuevoEstado = "";
+
+        if (estadoSeleccionadoId == R.id.rbEnviado) {
+            nuevoEstado = "Enviado";
+        } else if (estadoSeleccionadoId == R.id.rbCompletado) {
+            nuevoEstado = "Completado";
+        } else {
+            Toast.makeText(this, "Por favor, selecciona un estado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Obtener el repartidor seleccionado
+        int posicionRepartidorSeleccionado = spinnerRepartidor.getSelectedItemPosition();
+        Map<String, String> repartidorSeleccionado = repartidoresDisponibles.get(posicionRepartidorSeleccionado);
+        int idRepartidorSeleccionado = Integer.parseInt(repartidorSeleccionado.get("id"));
+
+        // Actualizar el estado y el repartidor en la orden
+        nOrden.actualizarEstadoYRepartidor(Integer.parseInt(idOrden), nuevoEstado, idRepartidorSeleccionado);
+
+        // Mostrar un mensaje de confirmación
+        Toast.makeText(this, "Estado de la orden actualizado", Toast.LENGTH_SHORT).show();
+
+        // Volver a la lista de órdenes
+        listarOrdenes();
+    }
+
+    private void cargarRepartidores() {
+        repartidoresDisponibles = nRepartidor.obtenerRepartidores();
+
+        List<String> nombresRepartidores = new ArrayList<>();
+        for (Map<String, String> repartidor : repartidoresDisponibles) {
+            String nombreRepartidor = repartidor.get("nombre");
+            String telefonoRepartidor = repartidor.get("nroTelefono");
+            nombresRepartidores.add(nombreRepartidor + " - " + telefonoRepartidor);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombresRepartidores);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRepartidor.setAdapter(adapter);
     }
 
     // Cargar clientes en el spinner
@@ -397,7 +478,8 @@ public class POrden extends AppCompatActivity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
     }
 
@@ -427,7 +509,8 @@ public class POrden extends AppCompatActivity {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
     }
 }

@@ -87,4 +87,8 @@ public class NProducto {
     public void actualizarStock(int idProducto, int nuevoStock) {
         dProducto.actualizarStock(idProducto, nuevoStock);
     }
+
+    public int obtenerStockProducto(int idProducto) {
+        return dProducto.obtenerStockProducto(idProducto);
+    }
 }

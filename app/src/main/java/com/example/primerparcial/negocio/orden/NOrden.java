@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.example.primerparcial.datos.orden.DOrden;
+import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +14,12 @@ import java.util.Map;
 public class NOrden {
 
     private DOrden dOrden;
+    private NDetalleOrden nDetalleOrden;
 
     // Constructor
     public NOrden(Context context) {
         dOrden = new DOrden(context);
+        nDetalleOrden = new NDetalleOrden(context);
     }
 
     // Método para registrar una nueva orden
@@ -55,6 +58,34 @@ public class NOrden {
 
     // Método para eliminar una orden
     public void eliminarOrden(int id) {
+        // Primero eliminar los detalles de la orden
+        nDetalleOrden.eliminarDetallesPorOrden(id);
+
+        // Luego eliminar la orden
         dOrden.eliminarOrden(id);
     }
+
+    public double obtenerTotalOrden(int idOrden) {
+        return dOrden.obtenerTotalOrden(idOrden);
+    }
+
+    // Método para actualizar el estado y asignar un repartidor a la orden
+    public void actualizarEstadoYRepartidor(int idOrden, String nuevoEstado, int idRepartidor) {
+        if (!nuevoEstado.equals("Enviado") && !nuevoEstado.equals("Completado")) {
+            throw new IllegalArgumentException("Estado no válido. Debe ser 'Enviado' o 'Completado'.");
+        }
+
+        dOrden.actualizarEstadoYRepartidor(idOrden, nuevoEstado, idRepartidor);
+    }
+
+    // Método para obtener los datos del cliente a partir de una orden
+    public Map<String, String> obtenerDatosCliente(int idOrden) {
+        // Llamamos al método en DOrden para obtener los datos del cliente
+        return dOrden.obtenerDatosCliente(idOrden);
+    }
+
+    public Map<String, String> obtenerDatosOrden(int idOrden) {
+        return dOrden.obtenerDatosOrden(idOrden);
+    }
+
 }

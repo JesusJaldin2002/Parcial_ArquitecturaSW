@@ -109,4 +109,45 @@ public class DDetalleOrden {
 
         return existe;
     }
+
+    // Método para obtener los detalles de una orden específica
+    public Cursor obtenerDetallesPorOrden(int idOrden) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT * FROM detalleOrden WHERE idOrden = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(idOrden)});
+    }
+
+    public void actualizarCantidad(int idDetalle, int nuevaCantidad) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("cantidad", nuevaCantidad);
+
+        db.update("detalleOrden", values, "id = ?", new String[]{String.valueOf(idDetalle)});
+        db.close();
+    }
+
+    public int obtenerIdProductoPorDetalle(int idDetalle) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int idProducto = -1;
+
+        // Consulta para obtener el idProducto según el id del detalle
+        Cursor cursor = db.rawQuery("SELECT idProducto FROM detalleOrden WHERE id = ?", new String[]{String.valueOf(idDetalle)});
+
+        if (cursor.moveToFirst()) {
+            idProducto = cursor.getInt(cursor.getColumnIndexOrThrow("idProducto"));
+        }
+
+        cursor.close();
+        db.close();
+
+        return idProducto;
+    }
+
+    public void eliminarDetallesPorOrden(int idOrden) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete("detalleOrden", "idOrden=?", new String[]{String.valueOf(idOrden)});
+        db.close();
+    }
+
+
 }

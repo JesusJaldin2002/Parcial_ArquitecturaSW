@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.primerparcial.datos.DBHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DOrden {
 
     private DBHelper dbHelper;
@@ -160,4 +163,71 @@ public class DOrden {
         db.update("ordenes", values, "id = ?", new String[]{String.valueOf(idOrden)});
         db.close();
     }
+
+    public double obtenerTotalOrden(int idOrden) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT total FROM ordenes WHERE id = ?", new String[]{String.valueOf(idOrden)});
+
+        double total = 0.0;
+        if (cursor.moveToFirst()) {
+            total = cursor.getDouble(cursor.getColumnIndexOrThrow("total"));
+        }
+        cursor.close();
+        db.close();
+
+        return total;
+    }
+
+    // Método para actualizar el estado de una orden y asignar un repartidor
+    public void actualizarEstadoYRepartidor(int idOrden, String nuevoEstado, int idRepartidor) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues valores = new ContentValues();
+        valores.put("estado", nuevoEstado);       // Actualiza el estado de la orden
+        valores.put("idRepartidor", idRepartidor); // Asigna el repartidor
+
+        db.update("ordenes", valores, "id=?", new String[]{String.valueOf(idOrden)});
+        db.close();
+    }
+
+    // Funcion para obtener los datos del cliente a partir del idCliente de la orden
+    public Map<String, String> obtenerDatosCliente(int idOrden) {
+        Map<String, String> datosCliente = new HashMap<>();
+
+        // Realizamos la consulta SQL
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT c.nombre, c.nroTelefono, c.imagenPath " +
+                "FROM ordenes o " +
+                "JOIN clientes c ON o.idCliente = c.id " +
+                "WHERE o.id = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idOrden)});
+
+        // Verificamos si tenemos datos y los extraemos
+        if (cursor.moveToFirst()) {
+            datosCliente.put("nombre", cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
+            datosCliente.put("nroTelefono", cursor.getString(cursor.getColumnIndexOrThrow("nroTelefono")));
+            datosCliente.put("imagenPath", cursor.getString(cursor.getColumnIndexOrThrow("imagenPath")));  // si tienes una imagen de cliente
+        }
+
+        // Cerramos el cursor y la base de datos
+        cursor.close();
+        db.close();
+
+        return datosCliente;
+    }
+
+    public Map<String, String> obtenerDatosOrden(int idOrden) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT fecha, total FROM ordenes WHERE id = ?", new String[]{String.valueOf(idOrden)});
+
+        Map<String, String> datosOrden = new HashMap<>();
+        if (cursor.moveToFirst()) {
+            datosOrden.put("fecha", cursor.getString(cursor.getColumnIndex("fecha")));
+            datosOrden.put("total", cursor.getString(cursor.getColumnIndex("total")));
+        }
+        cursor.close();
+        return datosOrden;
+    }
+
 }

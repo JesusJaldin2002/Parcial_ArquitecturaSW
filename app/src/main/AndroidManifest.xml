@@ -13,6 +13,16 @@
         android:theme="@style/Theme.PrimerParcial"
         tools:targetApi="31">
 
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
         <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
@@ -52,6 +62,16 @@
         <activity
             android:name=".presentacion.orden.POrden"
             android:label="Primer Parcial - Ordenes"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.detalleOrden.PDetalleOrden"
+            android:label="Primer Parcial - Detalles"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.catalogo.PCatalogo"
+            android:label="Primer Parcial - Catalogos"
             android:parentActivityName=".MainActivity" />
     </application>
 

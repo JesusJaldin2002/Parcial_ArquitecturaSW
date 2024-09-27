@@ -7,6 +7,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.primerparcial.datos.DBHelper;
+import com.example.primerparcial.presentacion.catalogo.PCatalogo;
 import com.example.primerparcial.presentacion.categoria.PCategoria;
 import com.example.primerparcial.presentacion.cliente.PCliente;
 import com.example.primerparcial.presentacion.orden.POrden;
@@ -47,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Button btnCatalogo = findViewById(R.id.btnCatalogo);
+        btnCatalogo.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, PCatalogo.class);
+            startActivity(intent);
+        });
 
         Button btnRepartidor = findViewById(R.id.btnRepartidor);
         btnRepartidor.setOnClickListener(v -> {

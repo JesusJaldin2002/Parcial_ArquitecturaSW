@@ -92,7 +92,7 @@ public class DBHelper extends SQLiteOpenHelper {
             "precio REAL NOT NULL, " +
             "idOrden INTEGER NOT NULL, " +
             "idProducto INTEGER NOT NULL, " +
-            "FOREIGN KEY(idOrden) REFERENCES ordenes(id), " +
+            "FOREIGN KEY(idOrden) REFERENCES ordenes(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
             "FOREIGN KEY(idProducto) REFERENCES productos(id));";
 
     private static final String crearTablaCatalogos = "CREATE TABLE catalogos (" +

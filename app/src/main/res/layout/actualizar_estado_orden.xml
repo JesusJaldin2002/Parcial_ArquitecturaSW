@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Título centrado en la parte superior -->
+        <TextView
+            android:id="@+id/tvEstadoOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado la Orden: id"
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="32dp"
+            android:gravity="center" />
+
+        <!-- Radio Buttons para el Estado de la Orden -->
+        <RadioGroup
+            android:id="@+id/radioGroupEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="32dp">
+
+            <RadioButton
+                android:id="@+id/rbEnviado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enviado"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+
+            <RadioButton
+                android:id="@+id/rbCompletado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Completado"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="16sp"/>
+        </RadioGroup>
+
+        <!-- Título del Spinner para Repartidores -->
+        <TextView
+            android:id="@+id/tvRepartidor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Repartidor"
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Spinner para seleccionar el Repartidor -->
+        <Spinner
+            android:id="@+id/spinnerRepartidor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:layout_marginBottom="40dp"
+            android:padding="6dp"/>
+
+        <!-- Botón para Actualizar Estado -->
+        <Button
+            android:id="@+id/btnActualizarEstado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Actualizar Estado"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Botón para Enviar Ubicación al Repartidor -->
+        <Button
+            android:id="@+id/btnEnviarUbicacionRepartidor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enviar Ubic. al repartidor"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Botón para Volver Atras -->
+        <Button
+            android:id="@+id/btnVolverAtras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver atrás"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white"
+            android:padding="16dp" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/background_color">
+
+    <!-- Detalles de la orden -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <!-- Título de la orden con el ID -->
+        <TextView
+            android:id="@+id/tvDetalleOrdenTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detalle de la Orden: "
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Monto total de la orden -->
+        <TextView
+            android:id="@+id/tvMontoTotalOrden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monto Total: "
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Lista dinámica de productos en la orden -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/listaProductosLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <!-- Botones fijos en la parte inferior -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Generar PDF -->
+        <Button
+            android:id="@+id/btnGenerarPdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Generar PDF"
+            android:backgroundTint="@color/dark_red"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="8dp" />
+
+        <!-- Botones de Mensaje y PDF por Whatsapp -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Enviar mensaje Whatsapp cliente -->
+<!--            <Button-->
+<!--                android:id="@+id/btnMsgWhatsappCliente"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Msg Whatsapp cliente"-->
+<!--                android:backgroundTint="@color/whatsapp_green"-->
+<!--            android:textColor="@android:color/white"-->
+<!--            android:layout_marginEnd="4dp" />-->
+
+            <!-- Enviar PDF por Whatsapp -->
+            <Button
+                android:id="@+id/btnPdfWhatsappCliente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PDF Whatsapp cliente"
+                android:backgroundTint="@color/whatsapp_green"
+            android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Botón de volver atrás -->
+        <Button
+            android:id="@+id/btnVolverAtras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver Atrás"
+            android:backgroundTint="@color/secondary_color"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="8dp" />
+    </LinearLayout>
+</LinearLayout>

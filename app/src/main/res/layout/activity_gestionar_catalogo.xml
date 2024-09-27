@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Título centrado en la parte superior -->
+        <TextView
+            android:id="@+id/tvRegistrarCatalogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registrar Catálogo"
+            android:textColor="@color/black"
+            android:fontFamily="sans-serif-black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="70dp"
+            android:gravity="center" />
+
+        <!-- Campo para Nombre del Catálogo -->
+        <EditText
+            android:id="@+id/etNombreCatalogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Nombre del Catálogo"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:layout_marginTop="30dp"/>
+
+        <!-- Campo para Fecha del Catálogo -->
+        <EditText
+            android:id="@+id/etFechaCatalogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Fecha (dd/mm/aaaa)"
+            android:clickable="true"
+            android:focusable="false"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
+
+        <!-- Campo para Descripción del Catálogo -->
+        <EditText
+            android:id="@+id/etDescripcionCatalogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/edittext_background"
+            android:hint="Descripción del Catálogo"
+            android:inputType="textMultiLine"
+            android:padding="12dp"
+            android:textColor="@color/black"
+            android:textSize="16sp"/>
+
+        <!-- Botones de acción -->
+        <Button
+            android:id="@+id/btnRegistrarCatalogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Agregar Catálogo"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="60dp"/>
+
+        <Button
+            android:id="@+id/btnListarCatalogos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Listar Catálogos"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnCancelarCatalogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volver atrás"
+            android:backgroundTint="@color/secondary_color"
+            android:textColor="@android:color/white"
+            android:padding="16dp" />
+    </LinearLayout>
+</ScrollView>

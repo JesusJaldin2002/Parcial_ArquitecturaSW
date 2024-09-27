@@ -178,4 +178,11 @@ public class DProducto {
         cursor.close();
         return 0; // Retornar 0 si no se encuentra el producto o no tiene stock
     }
+
+    // Método para obtener un producto por su ID
+    public Cursor obtenerProductoPorId(int idProducto) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT id, nombre, descripcion, precio, imagenPath, stock, idCategoria FROM productos WHERE id = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(idProducto)});
+    }
 }
