@@ -149,6 +149,13 @@ public class PCatalogoProducto extends AppCompatActivity {
 
                 // Botón Eliminar
                 Button btnEliminarProducto = productoView.findViewById(R.id.btnEliminarProducto);
+                btnEliminarProducto.setOnClickListener(v -> {
+                    // Obtener el ID del producto
+                    String idProducto = producto.get("id");
+
+                    // Llamar al método para mostrar el diálogo de confirmación
+                    eliminarProductoConConfirmacion(String.valueOf(idCatalogo), idProducto);
+                });
 
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -570,6 +577,41 @@ public class PCatalogoProducto extends AppCompatActivity {
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, "WhatsApp no está instalado en este dispositivo", Toast.LENGTH_LONG).show();
         }
+    }
+
+
+    private void eliminarProductoConConfirmacion(String idCatalogo, String idProducto) {
+        // Crear el diálogo manualmente
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_confirmar_eliminar);
+
+        // Configurar el título y el mensaje del diálogo
+        TextView tvTitulo = dialog.findViewById(R.id.tvTitulo);
+        TextView tvMensaje = dialog.findViewById(R.id.tvMensaje);
+        tvTitulo.setText("Eliminar Producto");
+        tvMensaje.setText("¿Estás seguro de que quieres eliminar este producto del catálogo?");
+
+        // Botón Sí para confirmar la eliminación
+        Button btnSi = dialog.findViewById(R.id.btnSi);
+        btnSi.setOnClickListener(v -> {
+            // Llamar a la capa de negocio para eliminar el producto del catálogo
+            nCatalogoProducto.eliminarProductoCatalogo(Integer.parseInt(idCatalogo), Integer.parseInt(idProducto));
+
+            // Mostrar mensaje de éxito
+            Toast.makeText(this, "Producto eliminado del catálogo", Toast.LENGTH_SHORT).show();
+
+            // Refrescar la lista de productos del catálogo
+            cargarProductosPorCatalogo(Integer.parseInt(idCatalogo));
+
+            // Cerrar el diálogo
+            dialog.dismiss();
+        });
+
+        // Botón No para cancelar la acción
+        Button btnNo = dialog.findViewById(R.id.btnNo);
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
 }
