@@ -2,11 +2,13 @@ package com.example.primerparcial.presentacion.orden;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -409,6 +411,9 @@ public class POrden extends AppCompatActivity {
         Button btnActualizarEstado = findViewById(R.id.btnActualizarEstado);
         btnActualizarEstado.setOnClickListener(v -> actualizarEstadoOrden(idOrden));
 
+        Button btnEnviarUbicacionRepartidor = findViewById(R.id.btnEnviarUbicacionRepartidor);
+        btnEnviarUbicacionRepartidor.setOnClickListener(v -> enviarUbicacion(Integer.parseInt(idOrden)));
+
         // Botón para volver atrás
         Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
         btnVolverAtras.setOnClickListener(v -> listarOrdenes());
@@ -513,4 +518,73 @@ public class POrden extends AppCompatActivity {
             }
         });
     }
+
+    private void enviarUbicacion(int idOrden) {
+        // Obtener los detalles de la orden, incluyendo el idCliente
+        Map<String, String> datosOrden = nOrden.obtenerDatosOrden(idOrden); // Asegúrate que este método obtiene la orden completa
+        String idCliente = datosOrden.get("idCliente");
+        Log.d("idCliente", idCliente);
+
+        if (idCliente != null && !idCliente.isEmpty()) {
+            // Obtener los datos del cliente (nombre y teléfono del cliente)
+            String datosCliente = nCliente.obtenerNombreClientePorId(Integer.parseInt(idCliente));
+
+            // Obtener la ubicación del cliente (nombre de la ubicación, urlMapa y referencia)
+            Map<String, String> ubicacionCliente = nCliente.obtenerUbicacionCliente(Integer.parseInt(idCliente));
+            Log.d("ubicacionCliente", String.valueOf(ubicacionCliente));
+
+            if (ubicacionCliente != null) {
+                String nombreUbicacion = ubicacionCliente.get("nombre");  // Este es el nombre de la ubicación, no del cliente
+                String referencia = ubicacionCliente.get("referencia");
+                String urlMapa = ubicacionCliente.get("urlMapa");
+
+                // Obtener el número del repartidor desde la vista
+                int posicionRepartidorSeleccionado = spinnerRepartidor.getSelectedItemPosition();
+                Map<String, String> repartidorSeleccionado = repartidoresDisponibles.get(posicionRepartidorSeleccionado);
+                String numeroRepartidor = repartidorSeleccionado.get("nroTelefono");
+
+                if (numeroRepartidor != null && !numeroRepartidor.isEmpty()) {
+                    // Formatear el mensaje correctamente
+                    String mensajeUbicacion = "Cliente: " + datosCliente + "\n" +  // Usamos el nombre del cliente, no de la ubicación
+                            "Referencia: " + referencia + "\n" +
+                            "Ubicación: " + urlMapa;
+
+                    // Enviar el mensaje por WhatsApp
+                    enviarUbicacionWhatsApp(mensajeUbicacion, numeroRepartidor);
+                } else {
+                    Toast.makeText(this, "Número del repartidor no disponible.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "No se encontró la ubicación del cliente.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "No se encontró el cliente para esta orden.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+    private void enviarUbicacionWhatsApp(String mensaje, String numeroRepartidor) {
+        if (numeroRepartidor != null && !numeroRepartidor.isEmpty()) {
+            String numeroFormateado = "591" + numeroRepartidor.replace(" ", "").replace("-", "");
+
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+            sendIntent.setType("text/plain");
+            sendIntent.putExtra(Intent.EXTRA_TEXT, mensaje);
+            sendIntent.putExtra("jid", numeroFormateado + "@s.whatsapp.net");
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            sendIntent.setPackage("com.whatsapp");
+
+            try {
+                startActivity(sendIntent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "WhatsApp no está instalado en este dispositivo", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "Número de teléfono del repartidor no disponible.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 }

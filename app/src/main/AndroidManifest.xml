@@ -66,12 +66,17 @@
 
         <activity
             android:name=".presentacion.detalleOrden.PDetalleOrden"
-            android:label="Primer Parcial - Detalles"
+            android:label="Detalles de la Orden"
             android:parentActivityName=".MainActivity" />
 
         <activity
             android:name=".presentacion.catalogo.PCatalogo"
             android:label="Primer Parcial - Catalogos"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.catalogoProducto.PCatalogoProducto"
+            android:label="Productos del Catálogo"
             android:parentActivityName=".MainActivity" />
     </application>
 

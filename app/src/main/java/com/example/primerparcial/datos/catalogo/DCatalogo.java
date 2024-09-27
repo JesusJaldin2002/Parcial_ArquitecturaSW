@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.primerparcial.datos.DBHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DCatalogo {
 
     private DBHelper dbHelper;
@@ -104,7 +107,31 @@ public class DCatalogo {
     // Método para eliminar un catálogo
     public void eliminarCatalogo(String id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        // Eliminar los productos asociados al catálogo
+        db.delete("catalogoProducto", "idCatalogo=?", new String[]{id});
+
+        // Eliminar el catálogo
         db.delete("catalogos", "id=?", new String[]{id});
+
         db.close();
+    }
+
+    public Map<String, String> obtenerDatosCatalogo(int idCatalogo) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT nombre, fecha, descripcion FROM catalogos WHERE id = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idCatalogo)});
+
+        Map<String, String> catalogoData = new HashMap<>();
+
+        if (cursor.moveToFirst()) {
+            catalogoData.put("nombre", cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
+            catalogoData.put("fecha", cursor.getString(cursor.getColumnIndexOrThrow("fecha")));
+            catalogoData.put("descripcion", cursor.getString(cursor.getColumnIndexOrThrow("descripcion")));
+        }
+
+        cursor.close();
+        db.close();
+        return catalogoData;
     }
 }

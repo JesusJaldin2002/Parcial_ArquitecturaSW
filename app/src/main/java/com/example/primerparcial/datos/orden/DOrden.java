@@ -219,12 +219,13 @@ public class DOrden {
 
     public Map<String, String> obtenerDatosOrden(int idOrden) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT fecha, total FROM ordenes WHERE id = ?", new String[]{String.valueOf(idOrden)});
+        Cursor cursor = db.rawQuery("SELECT idCliente, fecha, total FROM ordenes WHERE id = ?", new String[]{String.valueOf(idOrden)});
 
         Map<String, String> datosOrden = new HashMap<>();
         if (cursor.moveToFirst()) {
-            datosOrden.put("fecha", cursor.getString(cursor.getColumnIndex("fecha")));
-            datosOrden.put("total", cursor.getString(cursor.getColumnIndex("total")));
+            datosOrden.put("idCliente", cursor.getString(cursor.getColumnIndexOrThrow("idCliente")));
+            datosOrden.put("fecha", cursor.getString(cursor.getColumnIndexOrThrow("fecha")));
+            datosOrden.put("total", cursor.getString(cursor.getColumnIndexOrThrow("total")));
         }
         cursor.close();
         return datosOrden;

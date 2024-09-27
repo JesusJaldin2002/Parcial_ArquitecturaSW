@@ -59,4 +59,8 @@ public class NCliente {
     public String obtenerNombreClientePorId(int idCliente) {
         return dCliente.obtenerNombreClientePorId(idCliente);
     }
+
+    public Map<String, String> obtenerUbicacionCliente(int idCliente) {
+        return dCliente.obtenerUbicacionCliente(idCliente);
+    }
 }

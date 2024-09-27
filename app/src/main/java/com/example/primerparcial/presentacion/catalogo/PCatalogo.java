@@ -3,13 +3,20 @@ package com.example.primerparcial.presentacion.catalogo;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,9 +25,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.primerparcial.MainActivity;
 import com.example.primerparcial.R;
 import com.example.primerparcial.negocio.catalogo.NCatalogo;
+import com.example.primerparcial.negocio.catalogoProducto.NCatalogoProducto;
+import com.example.primerparcial.negocio.categoria.NCategoria;
+import com.example.primerparcial.negocio.producto.NProducto;
+import com.example.primerparcial.presentacion.catalogoProducto.PCatalogoProducto;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -29,27 +42,43 @@ import java.util.Map;
 public class PCatalogo extends AppCompatActivity {
 
     private NCatalogo nCatalogo;
-    private EditText etNombreCatalogo, etFechaCatalogo, etDescripcionCatalogo;
+    private NCategoria nCategoria;
+    private NProducto nProducto;
+    private NCatalogoProducto nCatalogoProducto;
     private View gestionarCatalogoView;
     private View listarCatalogosView;
+    private View anadirProductoView;
+
+    private EditText etNombreCatalogo, etFechaCatalogo, etDescripcionCatalogo;
+    private Spinner spinnerCategoria, spinnerProducto;
+    private TextView tvPrecioProducto, tvStockProducto;
+    private EditText etNotaProducto;
+    private ImageView ivImagenProducto;
+
+    private List<Map<String, String>> productosDisponibles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Inflar ambos layouts
+        // Inflar los layouts
         gestionarCatalogoView = getLayoutInflater().inflate(R.layout.activity_gestionar_catalogo, null);
         listarCatalogosView = getLayoutInflater().inflate(R.layout.lista_catalogo, null);
+        anadirProductoView = getLayoutInflater().inflate(R.layout.anadir_producto_catalogo, null);
 
-        // Inicialmente, mostrar la vista de gestionar catálogos
+        // Mostrar la vista de gestionar catálogos inicialmente
         setContentView(gestionarCatalogoView);
 
+        // Inicializar las clases de negocio
         nCatalogo = new NCatalogo(this);
+        nCategoria = new NCategoria(this);
+        nProducto = new NProducto(this);
+        nCatalogoProducto = new NCatalogoProducto(this);
 
+        // Inicializar las vistas del layout de gestionar catálogos
         etNombreCatalogo = findViewById(R.id.etNombreCatalogo);
         etFechaCatalogo = findViewById(R.id.etFechaCatalogo);
         etDescripcionCatalogo = findViewById(R.id.etDescripcionCatalogo);
 
-        // Mostrar el selector de fecha al hacer clic en el campo de fecha
         etFechaCatalogo.setOnClickListener(v -> showDatePickerDialog());
 
         Button btnRegistrar = findViewById(R.id.btnRegistrarCatalogo);
@@ -65,13 +94,11 @@ public class PCatalogo extends AppCompatActivity {
         });
     }
 
-    // Método para registrar un catálogo
     private void registrarCatalogo() {
         String nombre = etNombreCatalogo.getText().toString();
         String fecha = etFechaCatalogo.getText().toString();
         String descripcion = etDescripcionCatalogo.getText().toString();
 
-        // Validar si la fecha es válida
         if (!isValidDate(fecha)) {
             Toast.makeText(this, "Por favor, ingrese una fecha válida", Toast.LENGTH_SHORT).show();
             return;
@@ -81,7 +108,6 @@ public class PCatalogo extends AppCompatActivity {
             nCatalogo.insertarCatalogo(nombre, fecha, descripcion);
             Toast.makeText(this, "Catálogo registrado", Toast.LENGTH_SHORT).show();
 
-            // Limpiar los campos después de registrar
             etNombreCatalogo.setText("");
             etFechaCatalogo.setText("");
             etDescripcionCatalogo.setText("");
@@ -90,7 +116,7 @@ public class PCatalogo extends AppCompatActivity {
         }
     }
 
-    // Método para mostrar el selector de fecha
+    // Mostrar selector de fecha
     private void showDatePickerDialog() {
         final Calendar calendario = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
@@ -100,7 +126,7 @@ public class PCatalogo extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    // Validar si la fecha ingresada es válida
+    // Validar fecha
     private boolean isValidDate(String dateStr) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         sdf.setLenient(false);
@@ -112,20 +138,18 @@ public class PCatalogo extends AppCompatActivity {
         }
     }
 
-    // Método para listar catálogos
+    // Listar catálogos
     private void listarCatalogos() {
         setContentView(listarCatalogosView);
 
         LinearLayout listaCatalogosLayout = findViewById(R.id.listaCatalogosLayout);
         listaCatalogosLayout.removeAllViews();
 
-        // Obtenemos la lista de catálogos desde la capa de negocio
         List<Map<String, String>> catalogos = nCatalogo.obtenerCatalogos();
 
         for (Map<String, String> catalogo : catalogos) {
             View catalogoView = getLayoutInflater().inflate(R.layout.item_catalogo, null);
 
-            // Asignar los valores a las vistas
             TextView idTextView = catalogoView.findViewById(R.id.tvIdCatalogo);
             TextView nombreTextView = catalogoView.findViewById(R.id.tvNombreCatalogo);
             TextView fechaTextView = catalogoView.findViewById(R.id.tvFechaCatalogo);
@@ -136,26 +160,26 @@ public class PCatalogo extends AppCompatActivity {
             fechaTextView.setText("Fecha: " + catalogo.get("fecha"));
             descripcionTextView.setText("Descripción: " + catalogo.get("descripcion"));
 
-            // Botón Editar Catálogo
+            Button btnAnadirProductos = catalogoView.findViewById(R.id.btnAnadirProductos);
+            btnAnadirProductos.setOnClickListener(v -> mostrarAnadirProductoView(Integer.parseInt(catalogo.get("id"))));
+
+            Button btnVerProductos = catalogoView.findViewById(R.id.btnVerProductos);
+            btnVerProductos.setOnClickListener(v -> {
+                int idCatalogo = Integer.parseInt(catalogo.get("id"));
+                Intent intent = new Intent(PCatalogo.this, PCatalogoProducto.class);
+                intent.putExtra("idCatalogo", idCatalogo);  // Pasar el ID del catálogo como extra
+                startActivity(intent);  // Iniciar la actividad de PCatalogoProducto
+            });
+
+            // Botón para editar el catálogo
             Button btnEditarCatalogo = catalogoView.findViewById(R.id.btnEditarCatalogo);
             btnEditarCatalogo.setOnClickListener(v -> mostrarModalEditarCatalogo(catalogo));
 
-            // Botón Eliminar Catálogo
+            // Botón para eliminar el catálogo
             Button btnEliminarCatalogo = catalogoView.findViewById(R.id.btnEliminarCatalogo);
-            btnEliminarCatalogo.setOnClickListener(v -> {
-                // Mostrar confirmación antes de eliminar
-                eliminarCatalogoConConfirmacion(catalogo.get("id"));
-            });
+            btnEliminarCatalogo.setOnClickListener(v -> eliminarCatalogoConConfirmacion(catalogo.get("id")));
 
-            // Botón Ver Productos
-            Button btnVerProductos = catalogoView.findViewById(R.id.btnVerProductos);
-            btnVerProductos.setOnClickListener(v -> verProductosCatalogo(catalogo.get("id")));
 
-            // Botón Añadir Productos
-            Button btnAnadirProductos = catalogoView.findViewById(R.id.btnAnadirProductos);
-            btnAnadirProductos.setOnClickListener(v -> anadirProductoCatalogo(catalogo.get("id")));
-
-            // Agregar la vista del catálogo a la lista
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -170,35 +194,141 @@ public class PCatalogo extends AppCompatActivity {
         btnVolver.setOnClickListener(v -> setContentView(gestionarCatalogoView));
     }
 
-    // Método para mostrar confirmación de eliminación
-    private void eliminarCatalogoConConfirmacion(String catalogoId) {
-        // Crear el diálogo manualmente
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_confirmar_eliminar);
+    // Mostrar la vista de añadir producto
+    private void mostrarAnadirProductoView(int idCatalogo) {
+        setContentView(anadirProductoView);
 
-        // Configurar el título y el mensaje del diálogo
-        TextView tvTitulo = dialog.findViewById(R.id.tvTitulo);
-        TextView tvMensaje = dialog.findViewById(R.id.tvMensaje);
-        tvTitulo.setText("Eliminar Catálogo");
-        tvMensaje.setText("¿Estás seguro de que quieres eliminar este catálogo?");
+        // Inicializar los elementos de la vista de añadir producto
+        spinnerCategoria = findViewById(R.id.spinnerCategoria);
+        spinnerProducto = findViewById(R.id.spinnerProducto);
+        tvStockProducto = findViewById(R.id.tvStockProducto);
+        tvPrecioProducto = findViewById(R.id.tvPrecioProducto);
+        etNotaProducto = findViewById(R.id.etNotaProducto);
+        ivImagenProducto = findViewById(R.id.ivImagenProducto);
 
-        // Botón Sí para confirmar la eliminación
-        Button btnSi = dialog.findViewById(R.id.btnSi);
-        btnSi.setOnClickListener(v -> {
-            nCatalogo.eliminarCatalogo(catalogoId);
-            Toast.makeText(this, "Catálogo eliminado", Toast.LENGTH_SHORT).show();
-            listarCatalogos();
-            dialog.dismiss();
+        // Cargar las categorías en el spinner
+        cargarCategorias();
+
+        Button btnAnadirProducto = findViewById(R.id.btnAnadirProducto);
+        btnAnadirProducto.setOnClickListener(v -> {
+            // Verificar que se haya seleccionado un producto
+            if (spinnerProducto.getSelectedItemPosition() == -1) {
+                Toast.makeText(this, "Por favor, seleccione un producto", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Obtener el producto seleccionado
+            int posicionSeleccionada = spinnerProducto.getSelectedItemPosition();
+            Map<String, String> productoSeleccionado = productosDisponibles.get(posicionSeleccionada);
+            int idProducto = Integer.parseInt(productoSeleccionado.get("id"));
+
+            // Verificar si el producto ya está en el catálogo
+            if (nCatalogoProducto.productoYaEnCatalogo(idCatalogo, idProducto)) {
+                Toast.makeText(this, "El producto ya está en el catálogo", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Obtener la nota del producto
+            String nota = etNotaProducto.getText().toString().trim();
+
+            // Registrar el producto en el catálogo
+            nCatalogoProducto.registrarProductoCatalogo(idCatalogo, idProducto, nota);
+
+            // Mostrar mensaje de confirmación
+            Toast.makeText(this, "Producto añadido al catálogo", Toast.LENGTH_SHORT).show();
+
+            // Limpiar los campos para permitir agregar otro producto
+            etNotaProducto.setText("");
+            ivImagenProducto.setImageBitmap(null);
+            spinnerCategoria.setSelection(0);
         });
 
-        // Botón No para cancelar
-        Button btnNo = dialog.findViewById(R.id.btnNo);
-        btnNo.setOnClickListener(v -> dialog.dismiss());
+        // Botón para volver atrás
+        Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
+        btnVolverAtras.setOnClickListener(v -> listarCatalogos());
+    }
 
-        dialog.show();
+    // Método para cargar las categorías en el spinner
+    private void cargarCategorias() {
+        List<Map<String, String>> categorias = nCategoria.obtenerCategorias();
+        List<String> nombresCategorias = new ArrayList<>();
+        for (Map<String, String> categoria : categorias) {
+            nombresCategorias.add(categoria.get("nombre"));
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nombresCategorias);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategoria.setAdapter(adapter);
+
+        spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                cargarProductosPorCategoria(nombresCategorias.get(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No hacer nada
+            }
+        });
+    }
+
+    // Método para cargar los productos según la categoría seleccionada
+    private void cargarProductosPorCategoria(String categoriaSeleccionada) {
+        Map<String, List<Map<String, String>>> productosPorCategoria = nProducto.obtenerProductosPorCategoria();
+        productosDisponibles = productosPorCategoria.get(categoriaSeleccionada);
+
+        // Verificar si la categoría tiene productos disponibles
+        if (productosDisponibles == null || productosDisponibles.isEmpty()) {
+            Toast.makeText(this, "No hay productos disponibles en esta categoría", Toast.LENGTH_SHORT).show();
+            spinnerProducto.setAdapter(null);
+            return;
+        }
+
+        List<String> productosDisplay = new ArrayList<>();
+        for (Map<String, String> producto : productosDisponibles) {
+            String nombreProducto = producto.get("nombre");
+            String precioProducto = producto.get("precio");
+            productosDisplay.add(nombreProducto + " - " + precioProducto + " Bs");
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, productosDisplay);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerProducto.setAdapter(adapter);
+
+        // Manejar la selección de producto
+        spinnerProducto.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Map<String, String> productoSeleccionado = productosDisponibles.get(position);
+
+                if (productoSeleccionado != null) {
+                    tvPrecioProducto.setText("Precio: " + productoSeleccionado.get("precio") + " Bs");
+                    tvStockProducto.setText("Stock disponible: " + productoSeleccionado.get("stock"));
+
+                    // Cargar y mostrar la imagen del producto
+                    String imagenPath = productoSeleccionado.get("imagenPath");
+                    if (imagenPath != null) {
+                        try {
+                            Uri imageUri = Uri.parse(imagenPath);
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                            ivImagenProducto.setImageBitmap(bitmap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No hacer nada
+            }
+        });
     }
 
     private void mostrarModalEditarCatalogo(Map<String, String> catalogo) {
+        // Crear el diálogo manualmente
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.modal_editar_catalogo);
 
@@ -207,6 +337,7 @@ public class PCatalogo extends AppCompatActivity {
         EditText etFechaEditar = dialog.findViewById(R.id.etFechaCatalogoEditar);
         EditText etDescripcionEditar = dialog.findViewById(R.id.etDescripcionCatalogoEditar);
 
+        // Poner los valores actuales del catálogo en los campos
         etNombreEditar.setText(catalogo.get("nombre"));
         etFechaEditar.setText(catalogo.get("fecha"));
         etDescripcionEditar.setText(catalogo.get("descripcion"));
@@ -221,11 +352,6 @@ public class PCatalogo extends AppCompatActivity {
             String nuevoNombre = etNombreEditar.getText().toString();
             String nuevaFecha = etFechaEditar.getText().toString();
             String nuevaDescripcion = etDescripcionEditar.getText().toString();
-
-            if (!isValidDate(nuevaFecha)) {
-                Toast.makeText(this, "Por favor, ingrese una fecha válida", Toast.LENGTH_SHORT).show();
-                return;
-            }
 
             if (!nuevoNombre.isEmpty() && !nuevaFecha.isEmpty() && !nuevaDescripcion.isEmpty()) {
                 // Llamar a la capa de negocio para actualizar
@@ -247,15 +373,30 @@ public class PCatalogo extends AppCompatActivity {
         }
     }
 
-    // Método para ver los productos asociados al catálogo
-    private void verProductosCatalogo(String catalogoId) {
-        // Implementación para ver productos del catálogo
-        Toast.makeText(this, "Funcionalidad de ver productos no implementada aún", Toast.LENGTH_SHORT).show();
-    }
+    private void eliminarCatalogoConConfirmacion(String catalogoId) {
+        // Crear el diálogo manualmente
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_confirmar_eliminar);
 
-    // Método para añadir productos al catálogo
-    private void anadirProductoCatalogo(String catalogoId) {
-        // Implementación para añadir productos al catálogo
-        Toast.makeText(this, "Funcionalidad de añadir productos no implementada aún", Toast.LENGTH_SHORT).show();
+        // Configurar el título y el mensaje del diálogo
+        TextView tvTitulo = dialog.findViewById(R.id.tvTitulo);
+        TextView tvMensaje = dialog.findViewById(R.id.tvMensaje);
+        tvTitulo.setText("Eliminar Catálogo");
+        tvMensaje.setText("¿Estás seguro de que quieres eliminar este catálogo?");
+
+        // Botón Sí para confirmar la eliminación
+        Button btnSi = dialog.findViewById(R.id.btnSi);
+        btnSi.setOnClickListener(v -> {
+            nCatalogo.eliminarCatalogo(catalogoId);  // Eliminar catálogo y productos asociados
+            Toast.makeText(this, "Catálogo eliminado", Toast.LENGTH_SHORT).show();
+            listarCatalogos(); // Refrescar la lista
+            dialog.dismiss();
+        });
+
+        // Botón No para cancelar
+        Button btnNo = dialog.findViewById(R.id.btnNo);
+        btnNo.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 }

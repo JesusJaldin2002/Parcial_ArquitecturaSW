@@ -76,4 +76,8 @@ public class NCatalogo {
 
         return catalogo;
     }
+
+    public Map<String, String> obtenerDatosCatalogo(int idCatalogo) {
+        return dCatalogo.obtenerDatosCatalogo(idCatalogo);
+    }
 }

@@ -54,4 +54,7 @@ public class NRepartidor {
     public void eliminarRepartidor(String id) {
         dRepartidor.eliminarRepartidor(id);
     }
+
+    // Método para obtener el nombre de un repartidor por su ID
+
 }

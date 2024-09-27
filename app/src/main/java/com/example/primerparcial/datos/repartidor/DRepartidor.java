@@ -94,4 +94,7 @@ public class DRepartidor {
         db.delete("repartidores", "id=?", new String[]{id});
         db.close();
     }
+
+    // Metodo para obtener los datos de un repartidor por su id
+
 }

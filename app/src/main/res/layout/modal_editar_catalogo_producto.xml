@@ -10,17 +10,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="Editar Categoría"
+        android:text="Editar Nota del Producto"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
     <EditText
-        android:id="@+id/etNombreCategoriaEditar"
+        android:id="@+id/etNotaProductoEditar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nombre de la Categoría"
+        android:hint="Ingrese la nueva nota del producto"
         android:padding="8dp"
         android:layout_marginBottom="16dp" />
 
@@ -31,8 +31,9 @@
         android:gravity="center"
         android:layout_marginTop="16dp">
 
+        <!-- Botón Cancelar -->
         <Button
-            android:id="@+id/btnCancelarCategoriaEditar"
+            android:id="@+id/btnCancelarNotaProducto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -41,8 +42,9 @@
             android:text="Cancelar"
             android:textColor="@android:color/white" />
 
+        <!-- Botón Guardar -->
         <Button
-            android:id="@+id/btnGuardarCategoriaEditar"
+            android:id="@+id/btnGuardarNotaProducto"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

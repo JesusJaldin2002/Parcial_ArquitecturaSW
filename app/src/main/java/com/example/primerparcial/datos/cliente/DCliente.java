@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.primerparcial.datos.DBHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class DCliente {
 
     private DBHelper dbHelper;
@@ -120,4 +123,24 @@ public class DCliente {
 
         return nombreCliente;
     }
+
+    public Map<String, String> obtenerUbicacionCliente(int idCliente) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Map<String, String> ubicacion = null;
+
+        String query = "SELECT nombre, urlMapa, referencia FROM posiciones WHERE idCliente = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idCliente)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            ubicacion = new HashMap<>();
+            ubicacion.put("nombre", cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
+            ubicacion.put("urlMapa", cursor.getString(cursor.getColumnIndexOrThrow("urlMapa")));
+            ubicacion.put("referencia", cursor.getString(cursor.getColumnIndexOrThrow("referencia")));
+            cursor.close();
+        }
+        db.close();
+        return ubicacion;
+    }
+
+
 }
