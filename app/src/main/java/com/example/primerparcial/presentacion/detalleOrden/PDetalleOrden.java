@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.primerparcial.R;
@@ -55,7 +54,7 @@ public class PDetalleOrden extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detalle_orden); // Vista principal
+        setContentView(R.layout.activity_detalle_orden);
 
         nDetalleOrden = new NDetalleOrden(this);
         nOrden = new NOrden(this);
@@ -138,7 +137,7 @@ public class PDetalleOrden extends AppCompatActivity {
                 double totalDetalle = Double.parseDouble(detalle.get("monto"));
 
                 // Desplegar el modal de confirmación
-                mostrarConfirmacionEliminarProducto(detalle.get("id"), idProducto, cantidad, totalDetalle, itemView);
+                mostrarConfirmacionEliminarProducto(idOrdenSeleccionada, idProducto, cantidad, totalDetalle, itemView);
             });
 
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -190,11 +189,10 @@ public class PDetalleOrden extends AppCompatActivity {
                     return;
                 }
 
-                // Utilizar la función correcta para actualizar la cantidad en la base de datos
+                // Actualizar la cantidad en la base de datos
                 nDetalleOrden.actualizarCantidadDetalleOrden(
-                        Integer.parseInt(detalleProducto.get("id")),
-                        idProducto,
                         idOrdenSeleccionada,
+                        idProducto,
                         nuevaCantidad,
                         cantidadActual,
                         precioProducto
@@ -235,7 +233,7 @@ public class PDetalleOrden extends AppCompatActivity {
     }
 
     // Método para mostrar el modal de confirmación antes de eliminar
-    private void mostrarConfirmacionEliminarProducto(String idDetalle, int idProducto, int cantidad, double totalDetalle, View itemView) {
+    private void mostrarConfirmacionEliminarProducto(int idOrden, int idProducto, int cantidad, double totalDetalle, View itemView) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_confirmar_eliminar);
 
@@ -247,7 +245,7 @@ public class PDetalleOrden extends AppCompatActivity {
         Button btnSi = dialog.findViewById(R.id.btnSi);
         btnSi.setOnClickListener(v -> {
             // Eliminar el detalle de la orden y actualizar la vista
-            nDetalleOrden.eliminarDetalleOrden(Integer.parseInt(idDetalle), idOrdenSeleccionada, idProducto, cantidad, totalDetalle);
+            nDetalleOrden.eliminarDetalleOrden(idOrden, idProducto, cantidad, totalDetalle);
             listaProductosLayout.removeView(itemView);
             actualizarMontoTotal();
 
@@ -317,7 +315,7 @@ public class PDetalleOrden extends AppCompatActivity {
         int lineHeight = 20; // Altura de cada línea
 
         // Obtener los datos de la orden (incluyendo fecha y total)
-        Map<String, String> datosOrden = nOrden.obtenerDatosOrden(idOrdenSeleccionada); // Nuevo método para obtener fecha y total
+        Map<String, String> datosOrden = nOrden.obtenerDatosOrden(idOrdenSeleccionada);
         String fechaOrden = datosOrden.get("fecha");
         String totalOrden = datosOrden.get("total");
 
@@ -327,7 +325,7 @@ public class PDetalleOrden extends AppCompatActivity {
         // Mostrar la fecha y total
         startY += lineHeight;
         canvas.drawText("Fecha: " + (fechaOrden != null ? fechaOrden : "No disponible"), startX, startY, paint);
-        canvas.drawText("Total: " + (totalOrden != null ? totalOrden + " Bs" : "No disponible"), startX + 350, startY, paint); // Alinear total a la derecha
+        canvas.drawText("Total: " + (totalOrden != null ? totalOrden + " Bs" : "No disponible"), startX + 350, startY, paint);
 
         // Obtener los datos del cliente y mostrar
         startY += lineHeight;
@@ -344,7 +342,7 @@ public class PDetalleOrden extends AppCompatActivity {
                     Uri imageUri = Uri.parse(imagenPath);
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                     Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false);
-                    canvas.drawBitmap(scaledBitmap, startX + 450, startY - 60, paint); // Posiciona la imagen
+                    canvas.drawBitmap(scaledBitmap, startX + 450, startY - 60, paint);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -360,10 +358,10 @@ public class PDetalleOrden extends AppCompatActivity {
         // Dibujar encabezados de la tabla
         startY += lineHeight;
         canvas.drawText("ID", startX, startY, paint);
-        canvas.drawText("Nombre", startX + 50, startY, paint);  // Reducimos el espacio de Nombre
-        canvas.drawText("Cantidad", startX + 200, startY, paint);  // Reducimos el espacio de Cantidad
-        canvas.drawText("Precio", startX + 300, startY, paint);   // Reducimos el espacio de Precio
-        canvas.drawText("Monto", startX + 400, startY, paint);   // Reducimos el espacio de Monto
+        canvas.drawText("Nombre", startX + 50, startY, paint);
+        canvas.drawText("Cantidad", startX + 200, startY, paint);
+        canvas.drawText("Precio", startX + 300, startY, paint);
+        canvas.drawText("Monto", startX + 400, startY, paint);
         canvas.drawText("Imagen", startX + 500, startY, paint);
 
         // Línea separadora
@@ -377,10 +375,10 @@ public class PDetalleOrden extends AppCompatActivity {
             for (Map<String, String> detalle : detalles) {
                 // Dibujar detalles del producto alineados con los encabezados
                 canvas.drawText(detalle.get("idProducto"), startX, startY, paint);
-                canvas.drawText(detalle.get("nombre"), startX + 50, startY, paint);  // Alinear con el encabezado "Nombre"
-                canvas.drawText(detalle.get("cantidad"), startX + 200, startY, paint);  // Alinear con el encabezado "Cantidad"
-                canvas.drawText(detalle.get("precio") + " Bs", startX + 300, startY, paint);  // Alinear con el encabezado "Precio"
-                canvas.drawText(detalle.get("monto") + " Bs", startX + 400, startY, paint);  // Alinear con el encabezado "Monto"
+                canvas.drawText(detalle.get("nombre"), startX + 50, startY, paint);
+                canvas.drawText(detalle.get("cantidad"), startX + 200, startY, paint);
+                canvas.drawText(detalle.get("precio") + " Bs", startX + 300, startY, paint);
+                canvas.drawText(detalle.get("monto") + " Bs", startX + 400, startY, paint);
 
                 // Cargar la imagen si está disponible
                 String imagenPath = detalle.get("imagenPath");
@@ -389,14 +387,14 @@ public class PDetalleOrden extends AppCompatActivity {
                         Uri imageUri = Uri.parse(imagenPath);
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                         Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 50, 50, false);
-                        canvas.drawBitmap(scaledBitmap, startX + 500, startY - 25, paint); // Ajustar posición de la imagen
+                        canvas.drawBitmap(scaledBitmap, startX + 500, startY - 25, paint);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
 
                 // Mover el cursor a la siguiente fila
-                startY += lineHeight * 2; // Altura de cada producto
+                startY += lineHeight * 2;
 
                 // Si la página está llena, crear una nueva
                 if (startY > 800) {
@@ -404,7 +402,7 @@ public class PDetalleOrden extends AppCompatActivity {
                     pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
                     page = pdfDocument.startPage(pageInfo);
                     canvas = page.getCanvas();
-                    startY = topMargin; // Reiniciar Y para la nueva página
+                    startY = topMargin;
                 }
             }
         } else {
@@ -430,7 +428,6 @@ public class PDetalleOrden extends AppCompatActivity {
         pdfDocument.close();
     }
 
-
     // Método para abrir el PDF inmediatamente después de guardarlo
     private void abrirPDF(Uri pdfUri) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -442,8 +439,6 @@ public class PDetalleOrden extends AppCompatActivity {
             Toast.makeText(this, "No se pudo abrir el archivo PDF", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     // Método para generar el PDF y luego enviarlo por WhatsApp
     private void enviarPDFWhatsApp() {
@@ -509,7 +504,7 @@ public class PDetalleOrden extends AppCompatActivity {
                     Uri imageUri = Uri.parse(imagenPath);
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                     Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false);
-                    canvas.drawBitmap(scaledBitmap, startX + 450, startY - 60, paint); // Posiciona la imagen
+                    canvas.drawBitmap(scaledBitmap, startX + 450, startY - 60, paint);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -621,5 +616,4 @@ public class PDetalleOrden extends AppCompatActivity {
             Toast.makeText(this, "Número de teléfono del cliente no disponible.", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
