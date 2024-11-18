@@ -1,6 +1,7 @@
 package com.example.primerparcial.datos;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -91,13 +92,13 @@ public class DBHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(idRepartidor) REFERENCES repartidores(id));";
 
     private static final String crearTablaDetalleOrden = "CREATE TABLE detalleOrden (" +
-            "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-            "cantidad INTEGER NOT NULL, " +
-            "precio REAL NOT NULL, " +
             "idOrden INTEGER NOT NULL, " +
             "idProducto INTEGER NOT NULL, " +
+            "cantidad INTEGER NOT NULL, " +
+            "precio REAL NOT NULL, " +
+            "PRIMARY KEY(idOrden, idProducto), " +
             "FOREIGN KEY(idOrden) REFERENCES ordenes(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
-            "FOREIGN KEY(idProducto) REFERENCES productos(id));";
+            "FOREIGN KEY(idProducto) REFERENCES productos(id) ON DELETE CASCADE ON UPDATE CASCADE);";
 
     private static final String crearTablaCatalogos = "CREATE TABLE catalogos (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
@@ -106,11 +107,69 @@ public class DBHelper extends SQLiteOpenHelper {
             "descripcion TEXT NOT NULL);";
 
     private static final String crearTablaCatalogoProducto = "CREATE TABLE catalogoProducto (" +
-            "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-            "nota TEXT, " +
             "idCatalogo INTEGER NOT NULL, " +
             "idProducto INTEGER NOT NULL, " +
+            "nota TEXT, " +
+            "PRIMARY KEY(idCatalogo, idProducto), " +
             "FOREIGN KEY(idCatalogo) REFERENCES catalogos(id) ON DELETE CASCADE ON UPDATE CASCADE, " +
             "FOREIGN KEY(idProducto) REFERENCES productos(id) ON DELETE CASCADE ON UPDATE CASCADE);";
 
+
+    public void insertarDatosIniciales() {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Verificar si ya hay datos en la tabla clientes
+        boolean datosClientesExistentes = hayDatosEnTabla(db, "clientes");
+        boolean datosCategoriasExistentes = hayDatosEnTabla(db, "categorias");
+        boolean datosProductosExistentes = hayDatosEnTabla(db, "productos");
+
+        if (!datosClientesExistentes) {
+            // Insertar datos de ejemplo para clientes con imágenes
+            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 1', '123456789', 'android.resource://com.example.primerparcial/drawable/cliente1')");
+            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 2', '987654321', 'android.resource://com.example.primerparcial/drawable/cliente2')");
+        }
+
+        if (!datosCategoriasExistentes) {
+            // Insertar datos de ejemplo para categorías
+            db.execSQL("INSERT INTO categorias (nombre) VALUES ('Camisas')");
+            db.execSQL("INSERT INTO categorias (nombre) VALUES ('Zapatos')");
+        }
+
+        if (!datosProductosExistentes) {
+            // Insertar datos de ejemplo para productos en la categoría 'Camisas'
+            db.execSQL("INSERT INTO productos " +
+                    "(nombre, descripcion, precio, imagenPath, stock, idCategoria) " +
+                    "VALUES ('Camisa 1', 'Descripción Camisa 1', 15.0, 'android.resource://com.example.primerparcial/drawable/camisa1', 50, 1)");
+            db.execSQL("INSERT INTO productos " +
+                    "(nombre, descripcion, precio, imagenPath, stock, idCategoria) " +
+                    "VALUES ('Camisa 2', 'Descripción Camisa 2', 18.0, 'android.resource://com.example.primerparcial/drawable/camisa2', 60, 1)");
+            db.execSQL("INSERT INTO productos " +
+                    "(nombre, descripcion, precio, imagenPath, stock, idCategoria) " +
+                    "VALUES ('Camisa 3', 'Descripción Camisa 3', 20.0, 'android.resource://com.example.primerparcial/drawable/camisa3', 40, 1)");
+            db.execSQL("INSERT INTO productos " +
+                    "(nombre, descripcion, precio, imagenPath, stock, idCategoria) " +
+                    "VALUES ('Camisa 4', 'Descripción Camisa 4', 22.0, 'android.resource://com.example.primerparcial/drawable/camisa4', 30, 1)");
+
+            // Insertar datos de ejemplo para productos en la categoría 'Zapatos'
+            db.execSQL("INSERT INTO productos (nombre, descripcion, precio, imagenPath, stock, idCategoria) VALUES ('Zapato 1', 'Descripción Zapato 1', 25.0, 'android.resource://com.example.primerparcial/drawable/zapato1', 10, 2)");
+            db.execSQL("INSERT INTO productos (nombre, descripcion, precio, imagenPath, stock, idCategoria) VALUES ('Zapato 2', 'Descripción Zapato 1', 45.0, 'android.resource://com.example.primerparcial/drawable/zapato2', 15, 2)");
+            db.execSQL("INSERT INTO productos (nombre, descripcion, precio, imagenPath, stock, idCategoria) VALUES ('Zapato 3', 'Descripción Zapato 1', 75.0, 'android.resource://com.example.primerparcial/drawable/zapato3', 10, 2)");
+            db.execSQL("INSERT INTO productos (nombre, descripcion, precio, imagenPath, stock, idCategoria) VALUES ('Zapato 4', 'Descripción Zapato 1', 125.0, 'android.resource://com.example.primerparcial/drawable/zapato4', 10, 2)");
+
+        }
+
+    }
+
+    private boolean hayDatosEnTabla(SQLiteDatabase db, String nombreTabla) {
+        boolean existe = false;
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + nombreTabla, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                existe = cursor.getInt(0) > 0;
+            }
+            cursor.close();
+        }
+        return existe;
+    }
 }
+

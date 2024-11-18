@@ -6,7 +6,6 @@ import android.database.Cursor;
 import com.example.primerparcial.datos.detalleOrden.DDetalleOrden;
 import com.example.primerparcial.datos.orden.DOrden;
 import com.example.primerparcial.datos.producto.DProducto;
-import com.example.primerparcial.negocio.orden.NOrden;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,9 +53,9 @@ public class NDetalleOrden {
     }
 
     // Método para eliminar un detalle de orden y restar del total de la orden, además de restaurar el stock
-    public void eliminarDetalleOrden(int idDetalle, int idOrden, int idProducto, int cantidad, double totalDetalle) {
-        // 1. Eliminar el detalle de la orden
-        dDetalleOrden.eliminarDetalleOrden(idDetalle);
+    public void eliminarDetalleOrden(int idOrden, int idProducto, int cantidad, double totalDetalle) {
+        // 1. Eliminar el detalle de la orden usando idOrden e idProducto
+        dDetalleOrden.eliminarDetalleOrden(idOrden, idProducto);
 
         // 2. Restar el monto del detalle del total de la orden
         dOrden.actualizarTotalOrden(idOrden, totalDetalle, false);
@@ -79,7 +78,6 @@ public class NDetalleOrden {
         if (cursor.moveToFirst()) {
             do {
                 Map<String, String> detalleMap = new HashMap<>();
-                detalleMap.put("id", cursor.getString(cursor.getColumnIndexOrThrow("id")));
                 detalleMap.put("cantidad", cursor.getString(cursor.getColumnIndexOrThrow("cantidad")));
                 detalleMap.put("precio", cursor.getString(cursor.getColumnIndexOrThrow("precio")));
                 detalleMap.put("idProducto", cursor.getString(cursor.getColumnIndexOrThrow("idProducto")));
@@ -109,7 +107,7 @@ public class NDetalleOrden {
     }
 
     // Método para actualizar la cantidad de un detalle de la orden y ajustar el total de la orden
-    public void actualizarCantidadDetalleOrden(int idDetalle, int idProducto, int idOrden, int nuevaCantidad, int cantidadAnterior, double precio) {
+    public void actualizarCantidadDetalleOrden(int idOrden, int idProducto, int nuevaCantidad, int cantidadAnterior, double precio) {
         // Verificar la diferencia entre la cantidad nueva y la anterior
         int diferenciaCantidad = nuevaCantidad - cantidadAnterior;
 
@@ -127,12 +125,12 @@ public class NDetalleOrden {
             dProducto.actualizarStock(idProducto, nuevoStock);
         } else if (diferenciaCantidad < 0) {
             // Si la cantidad nueva es menor, estamos disminuyendo la cantidad, así que devolvemos al stock
-            int nuevoStock = stockDisponible + Math.abs(diferenciaCantidad); // Sumamos la diferencia al stock
+            int nuevoStock = stockDisponible + Math.abs(diferenciaCantidad);
             dProducto.actualizarStock(idProducto, nuevoStock);
         }
 
         // Actualizar la cantidad en la base de datos
-        dDetalleOrden.actualizarCantidad(idDetalle, nuevaCantidad);
+        dDetalleOrden.actualizarCantidad(idOrden, idProducto, nuevaCantidad);
 
         // Recalcular el total del detalle (nueva cantidad * precio)
         double nuevoMontoDetalle = nuevaCantidad * precio;
@@ -161,5 +159,4 @@ public class NDetalleOrden {
         // Ahora eliminar todos los detalles de la base de datos utilizando el método de la capa DDetalleOrden
         dDetalleOrden.eliminarDetallesPorOrden(idOrden);
     }
-
 }

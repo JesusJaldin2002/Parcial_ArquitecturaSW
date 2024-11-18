@@ -10,7 +10,6 @@ import com.example.primerparcial.datos.DBHelper;
 public class DDetalleOrden {
 
     private DBHelper dbHelper;
-    private int id;
     private int cantidad;
     private double precio;
     private int idOrden;
@@ -23,8 +22,7 @@ public class DDetalleOrden {
         dbHelper = new DBHelper(context);
     }
 
-    public DDetalleOrden(int id, int cantidad, double precio, int idOrden, int idProducto) {
-        this.id = id;
+    public DDetalleOrden(int cantidad, double precio, int idOrden, int idProducto) {
         this.cantidad = cantidad;
         this.precio = precio;
         this.idOrden = idOrden;
@@ -32,14 +30,6 @@ public class DDetalleOrden {
     }
 
     // Getters and Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public int getCantidad() {
         return cantidad;
     }
@@ -80,17 +70,14 @@ public class DDetalleOrden {
         values.put("precio", precio);
         values.put("idOrden", idOrden);
         values.put("idProducto", idProducto);
-        db.insert("detalleOrden", null, values);
+        db.insertWithOnConflict("detalleOrden", null, values, SQLiteDatabase.CONFLICT_REPLACE); // Reemplaza si ya existe la combinación
         db.close();
     }
 
     // Método para eliminar un detalle de orden
-    public void eliminarDetalleOrden(int idDetalle) {
+    public void eliminarDetalleOrden(int idOrden, int idProducto) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        // Eliminar el detalle de orden basado en el ID
-        db.delete("detalleOrden", "id = ?", new String[]{String.valueOf(idDetalle)});
-
+        db.delete("detalleOrden", "idOrden = ? AND idProducto = ?", new String[]{String.valueOf(idOrden), String.valueOf(idProducto)});
         db.close();
     }
 
@@ -117,30 +104,12 @@ public class DDetalleOrden {
         return db.rawQuery(query, new String[]{String.valueOf(idOrden)});
     }
 
-    public void actualizarCantidad(int idDetalle, int nuevaCantidad) {
+    public void actualizarCantidad(int idOrden, int idProducto, int nuevaCantidad) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("cantidad", nuevaCantidad);
-
-        db.update("detalleOrden", values, "id = ?", new String[]{String.valueOf(idDetalle)});
+        db.update("detalleOrden", values, "idOrden = ? AND idProducto = ?", new String[]{String.valueOf(idOrden), String.valueOf(idProducto)});
         db.close();
-    }
-
-    public int obtenerIdProductoPorDetalle(int idDetalle) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        int idProducto = -1;
-
-        // Consulta para obtener el idProducto según el id del detalle
-        Cursor cursor = db.rawQuery("SELECT idProducto FROM detalleOrden WHERE id = ?", new String[]{String.valueOf(idDetalle)});
-
-        if (cursor.moveToFirst()) {
-            idProducto = cursor.getInt(cursor.getColumnIndexOrThrow("idProducto"));
-        }
-
-        cursor.close();
-        db.close();
-
-        return idProducto;
     }
 
     public void eliminarDetallesPorOrden(int idOrden) {
@@ -148,6 +117,4 @@ public class DDetalleOrden {
         db.delete("detalleOrden", "idOrden=?", new String[]{String.valueOf(idOrden)});
         db.close();
     }
-
-
 }

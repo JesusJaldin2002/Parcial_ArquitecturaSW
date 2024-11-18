@@ -10,7 +10,6 @@ import com.example.primerparcial.datos.DBHelper;
 public class DCatalogoProducto {
 
     private DBHelper dbHelper;
-    private int id;
     private String nota;
     private int idCatalogo;
     private int idProducto;
@@ -22,22 +21,13 @@ public class DCatalogoProducto {
         dbHelper = new DBHelper(context);
     }
 
-    public DCatalogoProducto(int id, String nota, int idCatalogo, int idProducto) {
-        this.id = id;
+    public DCatalogoProducto(String nota, int idCatalogo, int idProducto) {
         this.nota = nota;
         this.idCatalogo = idCatalogo;
         this.idProducto = idProducto;
     }
 
     // Getters y Setters
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getNota() {
         return nota;
     }
@@ -64,7 +54,6 @@ public class DCatalogoProducto {
 
     // Método para cargar los datos desde un cursor
     public void cargarDesdeCursor(Cursor cursor) {
-        this.id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         this.nota = cursor.getString(cursor.getColumnIndexOrThrow("nota"));
         this.idCatalogo = cursor.getInt(cursor.getColumnIndexOrThrow("idCatalogo"));
         this.idProducto = cursor.getInt(cursor.getColumnIndexOrThrow("idProducto"));
@@ -91,7 +80,7 @@ public class DCatalogoProducto {
     public Cursor obtenerProductosPorCatalogoConCategorias(int idCatalogo) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT cp.id AS idCatalogoProducto, p.id, p.nombre, p.descripcion, p.precio, p.imagenPath, p.stock, c.nombre AS categoria, cp.nota, cp.idCatalogo AS idCatalogo " +
+        String query = "SELECT cp.idCatalogo, cp.idProducto, p.id, p.nombre, p.descripcion, p.precio, p.imagenPath, p.stock, c.nombre AS categoria, cp.nota " +
                 "FROM productos p " +
                 "JOIN categorias c ON p.idCategoria = c.id " +
                 "JOIN catalogoProducto cp ON p.id = cp.idProducto " +
@@ -123,14 +112,14 @@ public class DCatalogoProducto {
         return existe;
     }
 
-    // Método en la capa de datos para actualizar la nota del producto (DCatalogoProducto)
-    public void actualizarNotaProducto(String idCatalogoProducto, String nuevaNota) {
+    // Método en la capa de datos para actualizar la nota del producto en un catálogo específico
+    public void actualizarNotaProducto(int idCatalogo, int idProducto, String nuevaNota) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("nota", nuevaNota);
 
-        // Actualizar la nota en la base de datos usando el idCatalogoProducto
-        db.update("catalogoProducto", values, "id = ?", new String[]{idCatalogoProducto});
+        // Actualizar la nota usando las claves compuestas
+        db.update("catalogoProducto", values, "idCatalogo = ? AND idProducto = ?", new String[]{String.valueOf(idCatalogo), String.valueOf(idProducto)});
         db.close();
     }
 }

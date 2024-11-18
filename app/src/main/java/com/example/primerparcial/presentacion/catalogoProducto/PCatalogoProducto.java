@@ -76,7 +76,6 @@ public class PCatalogoProducto extends AppCompatActivity {
 
         btnGenerarPDF.setOnClickListener(v -> generarPDF(idCatalogo));
 
-
         btnEnviarPDFWhatsapp.setOnClickListener(v -> {
             generarPDFYEnviarPorWhatsApp();
         });
@@ -128,7 +127,7 @@ public class PCatalogoProducto extends AppCompatActivity {
                 }
 
                 // Asignar valores a las vistas del producto
-                idTextView.setText("ID: " + producto.get("id"));
+                idTextView.setText("ID: " + producto.get("idProducto"));
                 nombreTextView.setText("Nombre: " + producto.get("nombre"));
                 descripcionTextView.setText("Descripción: " + producto.get("descripcion"));
                 stockTextView.setText("Stock: " + producto.get("stock"));
@@ -151,10 +150,10 @@ public class PCatalogoProducto extends AppCompatActivity {
                 Button btnEliminarProducto = productoView.findViewById(R.id.btnEliminarProducto);
                 btnEliminarProducto.setOnClickListener(v -> {
                     // Obtener el ID del producto
-                    String idProducto = producto.get("id");
+                    String idProducto = producto.get("idProducto");
 
                     // Llamar al método para mostrar el diálogo de confirmación
-                    eliminarProductoConConfirmacion(String.valueOf(idCatalogo), idProducto);
+                    eliminarProductoConConfirmacion(idCatalogo, Integer.parseInt(idProducto));
                 });
 
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -191,14 +190,6 @@ public class PCatalogoProducto extends AppCompatActivity {
         EditText etNotaEditar = dialog.findViewById(R.id.etNotaProductoEditar);
         etNotaEditar.setText(producto.get("nota"));
 
-
-        // Obtener idCatalogoProducto desde el mapa producto
-        String idCatalogoProducto = producto.get("idCatalogoProducto");
-        if (idCatalogoProducto == null) {
-            Toast.makeText(this, "idCatalogoProducto es nulo", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         // Botón Cancelar
         Button btnCancelarEditar = dialog.findViewById(R.id.btnCancelarNotaProducto);
         btnCancelarEditar.setOnClickListener(v -> dialog.dismiss());  // Cerrar el modal si se presiona "Cancelar"
@@ -210,14 +201,14 @@ public class PCatalogoProducto extends AppCompatActivity {
 
             if (!nuevaNota.isEmpty()) {
                 // Llamar a la capa de negocio para actualizar la nota del producto
-                nCatalogoProducto.actualizarNotaProducto(idCatalogoProducto, nuevaNota);
+                nCatalogoProducto.actualizarNotaProducto(idCatalogo, Integer.parseInt(producto.get("idProducto")), nuevaNota);
 
                 // Mostrar un mensaje de éxito
                 Toast.makeText(PCatalogoProducto.this, "Nota del producto actualizada", Toast.LENGTH_SHORT).show();
 
                 // Cerrar el modal y refrescar la lista
                 dialog.dismiss();
-                cargarProductosPorCatalogo(Integer.parseInt(producto.get("idCatalogo")));  // Refrescar los productos del catálogo
+                cargarProductosPorCatalogo(idCatalogo);  // Refrescar los productos del catálogo
             } else {
                 Toast.makeText(PCatalogoProducto.this, "Por favor, ingrese una nueva nota", Toast.LENGTH_SHORT).show();
             }
@@ -580,7 +571,7 @@ public class PCatalogoProducto extends AppCompatActivity {
     }
 
 
-    private void eliminarProductoConConfirmacion(String idCatalogo, String idProducto) {
+    private void eliminarProductoConConfirmacion(int idCatalogo, int idProducto) {
         // Crear el diálogo manualmente
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_confirmar_eliminar);
@@ -595,13 +586,13 @@ public class PCatalogoProducto extends AppCompatActivity {
         Button btnSi = dialog.findViewById(R.id.btnSi);
         btnSi.setOnClickListener(v -> {
             // Llamar a la capa de negocio para eliminar el producto del catálogo
-            nCatalogoProducto.eliminarProductoCatalogo(Integer.parseInt(idCatalogo), Integer.parseInt(idProducto));
+            nCatalogoProducto.eliminarProductoCatalogo(idCatalogo, idProducto);
 
             // Mostrar mensaje de éxito
             Toast.makeText(this, "Producto eliminado del catálogo", Toast.LENGTH_SHORT).show();
 
             // Refrescar la lista de productos del catálogo
-            cargarProductosPorCatalogo(Integer.parseInt(idCatalogo));
+            cargarProductosPorCatalogo(idCatalogo);
 
             // Cerrar el diálogo
             dialog.dismiss();

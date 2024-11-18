@@ -65,5 +65,6 @@ public class MainActivity extends AppCompatActivity {
     private void inicializarBaseDeDatos() {
         DBHelper dbHelper = new DBHelper(this);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
+        dbHelper.insertarDatosIniciales();
     }
 }

@@ -35,7 +35,7 @@ public class NCatalogoProducto {
         if (cursor.moveToFirst()) {
             do {
                 Map<String, String> productoMap = new HashMap<>();
-                productoMap.put("id", cursor.getString(cursor.getColumnIndexOrThrow("idProducto")));
+                productoMap.put("idProducto", cursor.getString(cursor.getColumnIndexOrThrow("idProducto")));
                 productoMap.put("nota", cursor.getString(cursor.getColumnIndexOrThrow("nota")));
                 productoMap.put("idCatalogo", cursor.getString(cursor.getColumnIndexOrThrow("idCatalogo")));
 
@@ -65,6 +65,7 @@ public class NCatalogoProducto {
         dCatalogoProducto.eliminarProductoCatalogo(idCatalogo, idProducto);
     }
 
+    // Método para obtener productos agrupados por categoría en un catálogo
     public Map<String, List<Map<String, String>>> obtenerProductosPorCategoriaCatalogo(int idCatalogo) {
         Map<String, List<Map<String, String>>> productosPorCategoria = new HashMap<>();
 
@@ -75,15 +76,14 @@ public class NCatalogoProducto {
             do {
                 // Crear un Map para almacenar los datos del producto
                 Map<String, String> producto = new HashMap<>();
-                producto.put("id", cursor.getString(cursor.getColumnIndexOrThrow("id")));  // ID del producto
-                producto.put("idCatalogoProducto", cursor.getString(cursor.getColumnIndexOrThrow("idCatalogoProducto")));  // ID de la tabla catalogoProducto
+                producto.put("idProducto", cursor.getString(cursor.getColumnIndexOrThrow("id")));  // ID del producto
+                producto.put("idCatalogo", cursor.getString(cursor.getColumnIndexOrThrow("idCatalogo")));
                 producto.put("nombre", cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
                 producto.put("descripcion", cursor.getString(cursor.getColumnIndexOrThrow("descripcion")));
                 producto.put("precio", cursor.getString(cursor.getColumnIndexOrThrow("precio")));
                 producto.put("imagenPath", cursor.getString(cursor.getColumnIndexOrThrow("imagenPath")));
                 producto.put("stock", cursor.getString(cursor.getColumnIndexOrThrow("stock")));
                 producto.put("nota", cursor.getString(cursor.getColumnIndexOrThrow("nota")));
-                producto.put("idCatalogo", cursor.getString(cursor.getColumnIndexOrThrow("idCatalogo")));
 
                 String categoria = cursor.getString(cursor.getColumnIndexOrThrow("categoria"));
 
@@ -99,16 +99,13 @@ public class NCatalogoProducto {
         return productosPorCategoria;
     }
 
-
+    // Método para verificar si un producto ya está en un catálogo
     public boolean productoYaEnCatalogo(int idCatalogo, int idProducto) {
         return dCatalogoProducto.productoYaEnCatalogo(idCatalogo, idProducto);
     }
 
-    // Método para actualizar la nota del producto en la capa de negocio (NCatalogoProducto)
-    public void actualizarNotaProducto(String idCatalogoProducto, String nuevaNota) {
-        dCatalogoProducto.actualizarNotaProducto(idCatalogoProducto, nuevaNota);  // Asegurarse de que el método reciba el idCatalogoProducto
+    // Método para actualizar la nota del producto en la capa de negocio
+    public void actualizarNotaProducto(int idCatalogo, int idProducto, String nuevaNota) {
+        dCatalogoProducto.actualizarNotaProducto(idCatalogo, idProducto, nuevaNota);
     }
-
-    // Metodo para obtener los datos de un catalogo
-
 }
