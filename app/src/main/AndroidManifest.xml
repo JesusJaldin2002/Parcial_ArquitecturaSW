@@ -78,6 +78,11 @@
             android:name=".presentacion.catalogoProducto.PCatalogoProducto"
             android:label="Productos del Catálogo"
             android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".presentacion.reporte.PReporte"
+            android:label="Reportes de Ventas"
+            android:parentActivityName=".MainActivity" />
     </application>
 
 

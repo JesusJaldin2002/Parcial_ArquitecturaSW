@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="tipo_reportes">
+        <item>Ordenes</item>
+        <item>Categoria</item>
+        <item>Producto</item>
+    </string-array>
+</resources>

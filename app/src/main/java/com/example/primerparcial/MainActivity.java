@@ -13,6 +13,7 @@ import com.example.primerparcial.presentacion.cliente.PCliente;
 import com.example.primerparcial.presentacion.orden.POrden;
 import com.example.primerparcial.presentacion.producto.PProducto;
 import com.example.primerparcial.presentacion.repartidor.PRepartidor;
+import com.example.primerparcial.presentacion.reporte.PReporte;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,6 +57,12 @@ public class MainActivity extends AppCompatActivity {
         Button btnRepartidor = findViewById(R.id.btnRepartidor);
         btnRepartidor.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, PRepartidor.class);
+            startActivity(intent);
+        });
+
+        Button btnReporte = findViewById(R.id.btnReporte);
+        btnReporte.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, PReporte.class);
             startActivity(intent);
         });
 
