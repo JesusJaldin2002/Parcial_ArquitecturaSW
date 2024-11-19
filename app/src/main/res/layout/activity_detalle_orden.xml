@@ -35,7 +35,6 @@
             android:textColor="@color/black"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp" />
-
     </LinearLayout>
 
     <!-- Lista dinámica de productos en la orden -->
@@ -60,58 +59,82 @@
 
     </LinearLayout>
 
-    <!-- Botones fijos en la parte inferior -->
+    <!-- Sección para generar documentos -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Generar:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Botones en dos filas -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:weightSum="2">
 
-        <!-- Generar PDF -->
+        <!-- Botón para generar PDF -->
         <Button
             android:id="@+id/btnGenerarPdf"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Generar PDF"
+            android:layout_weight="1"
+            android:text="PDF"
             android:backgroundTint="@color/dark_red"
-        android:textColor="@android:color/white"
-        android:layout_marginBottom="8dp" />
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="4dp" />
 
-        <!-- Botones de Mensaje y PDF por Whatsapp -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <!-- Enviar mensaje Whatsapp cliente -->
-<!--            <Button-->
-<!--                android:id="@+id/btnMsgWhatsappCliente"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1"-->
-<!--                android:text="Msg Whatsapp cliente"-->
-<!--                android:backgroundTint="@color/whatsapp_green"-->
-<!--            android:textColor="@android:color/white"-->
-<!--            android:layout_marginEnd="4dp" />-->
-
-            <!-- Enviar PDF por Whatsapp -->
-            <Button
-                android:id="@+id/btnPdfWhatsappCliente"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="PDF Whatsapp cliente"
-                android:backgroundTint="@color/whatsapp_green"
-            android:textColor="@android:color/white" />
-        </LinearLayout>
-
-        <!-- Botón de volver atrás -->
+        <!-- Botón para generar JPG -->
         <Button
-            android:id="@+id/btnVolverAtras"
-            android:layout_width="match_parent"
+            android:id="@+id/btnGenerarJpg"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Volver Atrás"
-            android:backgroundTint="@color/secondary_color"
+            android:layout_weight="1"
+            android:text="JPG"
+            android:backgroundTint="@color/blue"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp"
+        android:weightSum="2">
+
+        <!-- Botón para generar EXCEL -->
+        <Button
+            android:id="@+id/btnGenerarExcel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="EXCEL"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="4dp" />
+
+        <!-- Botón para generar MENSAJE -->
+        <Button
+            android:id="@+id/btnGenerarMensaje"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="MENSAJE"
+            android:backgroundTint="@color/yellow"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+
+    <!-- Botón de volver atrás -->
+    <Button
+        android:id="@+id/btnVolverAtras"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Volver Atrás"
+        android:backgroundTint="@color/secondary_color"
         android:textColor="@android:color/white"
         android:layout_marginTop="8dp" />
-    </LinearLayout>
 </LinearLayout>

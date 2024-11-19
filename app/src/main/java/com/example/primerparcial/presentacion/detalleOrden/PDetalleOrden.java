@@ -1,20 +1,11 @@
 package com.example.primerparcial.presentacion.detalleOrden;
 
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.core.content.FileProvider;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,50 +22,72 @@ import com.example.primerparcial.R;
 import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
 import com.example.primerparcial.negocio.orden.NOrden;
 import com.example.primerparcial.negocio.producto.NProducto;
+import com.example.primerparcial.presentacion.detalleOrden.strategy.DocumentContext;
+import com.example.primerparcial.presentacion.detalleOrden.strategy.DocumentStrategy;
+import com.example.primerparcial.presentacion.detalleOrden.strategy.JPGStrategy;
+import com.example.primerparcial.presentacion.detalleOrden.strategy.MessageStrategy;
+import com.example.primerparcial.presentacion.detalleOrden.strategy.PDFStrategy;
+import com.example.primerparcial.presentacion.detalleOrden.strategy.XLSXStrategy;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
 public class PDetalleOrden extends AppCompatActivity {
 
-    private static final int CREATE_FILE = 1;
+        private NDetalleOrden nDetalleOrden;
+        private NOrden nOrden;
+        private NProducto nProducto;
+        private LinearLayout listaProductosLayout;
+        private TextView tvMontoTotal;
+        private int idOrdenSeleccionada;
+        private DocumentContext documentContext;
 
-    private NDetalleOrden nDetalleOrden;
-    private NOrden nOrden;
-    private NProducto nProducto;
-    private LinearLayout listaProductosLayout;
-    private TextView tvMontoTotal;
-    private int idOrdenSeleccionada;
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_detalle_orden);
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detalle_orden);
+            nDetalleOrden = new NDetalleOrden(this);
+            nOrden = new NOrden(this);
+            nProducto = new NProducto(this);
+            documentContext = new DocumentContext(this);
 
-        nDetalleOrden = new NDetalleOrden(this);
-        nOrden = new NOrden(this);
-        nProducto = new NProducto(this);
+            // Recibir el id de la orden
+            Intent intent = getIntent();
+            idOrdenSeleccionada = intent.getIntExtra("idOrden", -1);
 
-        // Recibir el id de la orden
-        Intent intent = getIntent();
-        idOrdenSeleccionada = intent.getIntExtra("idOrden", -1);
+            if (idOrdenSeleccionada != -1) {
+                mostrarDetalleOrden();
+            }
 
-        if (idOrdenSeleccionada != -1) {
-            mostrarDetalleOrden();
+            Button btnGenerarPDF = findViewById(R.id.btnGenerarPdf);
+            btnGenerarPDF.setOnClickListener(v -> ejecutarEstrategia(new PDFStrategy(this)));
+
+            Button btnGenerarJPG = findViewById(R.id.btnGenerarJpg);
+            btnGenerarJPG.setOnClickListener(v -> ejecutarEstrategia(new JPGStrategy(this)));
+
+            Button btnGenerarExcel = findViewById(R.id.btnGenerarExcel);
+            btnGenerarExcel.setOnClickListener(v -> ejecutarEstrategia(new XLSXStrategy(this)));
+
+            Button btnGenerarMensaje = findViewById(R.id.btnGenerarMensaje);
+            btnGenerarMensaje.setOnClickListener(v -> ejecutarEstrategia(new MessageStrategy(this)));
+
+            Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
+            btnVolverAtras.setOnClickListener(v -> finish());
         }
 
-        Button btnGenerarPDF = findViewById(R.id.btnGenerarPdf);
-        btnGenerarPDF.setOnClickListener(v -> generarPDF());
+    private void ejecutarEstrategia(DocumentStrategy strategy) {
+        documentContext.setStrategy(strategy);
 
-        Button btnPdfWhatsApp = findViewById(R.id.btnPdfWhatsappCliente);
-        btnPdfWhatsApp.setOnClickListener(v -> enviarPDFWhatsApp());
+        // Obtén los datos desglosados
+        int orderId = idOrdenSeleccionada;
+        Map<String, String> orderData = nOrden.obtenerDatosOrden(idOrdenSeleccionada);
+        Map<String, String> clientData = nOrden.obtenerDatosCliente(idOrdenSeleccionada);
+        List<Map<String, String>> orderDetails = nDetalleOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
 
-        Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
-        btnVolverAtras.setOnClickListener(v -> finish());
+        // Llama a documentContext con datos desglosados
+        documentContext.executeStrategy(orderId, orderData, clientData, orderDetails);
     }
 
     // Método para mostrar los detalles de la orden
@@ -263,357 +275,5 @@ public class PDetalleOrden extends AppCompatActivity {
     private void actualizarMontoTotal() {
         double nuevoMontoTotal = nOrden.obtenerTotalOrden(idOrdenSeleccionada);
         tvMontoTotal.setText("Monto Total: " + nuevoMontoTotal + " Bs");
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CREATE_FILE && resultCode == RESULT_OK) {
-            if (data != null) {
-                Uri uri = data.getData();
-                guardarPDFEnUri(uri);
-            }
-        }
-    }
-
-    // Generar el PDF, utilizando el método guardarPDFEnUri
-    private void generarPDF() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Android 10 y superior, usar selector de archivos
-            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("application/pdf");
-            intent.putExtra(Intent.EXTRA_TITLE, "Detalle_Orden_" + idOrdenSeleccionada + ".pdf");
-            startActivityForResult(intent, CREATE_FILE);
-        } else {
-            Toast.makeText(this, "Guardar en almacenamiento no soportado en esta versión. Utiliza Android 10 o superior.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // Guardar PDF en la ubicación seleccionada por el usuario (funciona en Android 10+)
-    private void guardarPDFEnUri(Uri uri) {
-        PdfDocument pdfDocument = new PdfDocument();
-        Paint paint = new Paint();
-        Paint titlePaint = new Paint();
-        titlePaint.setTextSize(16);
-        titlePaint.setFakeBoldText(true);
-
-        // Página 1 (Tamaño A4: 595 x 842 puntos)
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-
-        // Obtener el Canvas para dibujar
-        Canvas canvas = page.getCanvas();
-
-        // Definir márgenes
-        int leftMargin = 30;
-        int topMargin = 30;
-
-        // Definir posiciones iniciales (teniendo en cuenta los márgenes)
-        int startX = leftMargin;
-        int startY = topMargin;
-        int lineHeight = 20; // Altura de cada línea
-
-        // Obtener los datos de la orden (incluyendo fecha y total)
-        Map<String, String> datosOrden = nOrden.obtenerDatosOrden(idOrdenSeleccionada);
-        String fechaOrden = datosOrden.get("fecha");
-        String totalOrden = datosOrden.get("total");
-
-        // Dibujar encabezado: Orden de compra y datos del cliente
-        canvas.drawText("ORDEN DE COMPRA: #" + idOrdenSeleccionada, startX, startY, titlePaint);
-
-        // Mostrar la fecha y total
-        startY += lineHeight;
-        canvas.drawText("Fecha: " + (fechaOrden != null ? fechaOrden : "No disponible"), startX, startY, paint);
-        canvas.drawText("Total: " + (totalOrden != null ? totalOrden + " Bs" : "No disponible"), startX + 350, startY, paint);
-
-        // Obtener los datos del cliente y mostrar
-        startY += lineHeight;
-        Map<String, String> datosCliente = nOrden.obtenerDatosCliente(idOrdenSeleccionada);
-        if (datosCliente != null) {
-            canvas.drawText("Cliente: " + datosCliente.get("nombre"), startX, startY, paint);
-            startY += lineHeight;
-            canvas.drawText("Teléfono: " + datosCliente.get("nroTelefono"), startX, startY, paint);
-
-            // Si hay imagen del cliente
-            String imagenPath = datosCliente.get("imagenPath");
-            if (imagenPath != null && !imagenPath.isEmpty()) {
-                try {
-                    Uri imageUri = Uri.parse(imagenPath);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false);
-                    canvas.drawBitmap(scaledBitmap, startX + 450, startY - 60, paint);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            canvas.drawText("Cliente: Información no disponible", startX, startY, paint);
-        }
-
-        // Espacio para la lista de productos
-        startY += 2 * lineHeight;
-        canvas.drawText("Lista de Productos:", startX, startY, titlePaint);
-
-        // Dibujar encabezados de la tabla
-        startY += lineHeight;
-        canvas.drawText("ID", startX, startY, paint);
-        canvas.drawText("Nombre", startX + 50, startY, paint);
-        canvas.drawText("Cantidad", startX + 200, startY, paint);
-        canvas.drawText("Precio", startX + 300, startY, paint);
-        canvas.drawText("Monto", startX + 400, startY, paint);
-        canvas.drawText("Imagen", startX + 500, startY, paint);
-
-        // Línea separadora
-        startY += lineHeight;
-        canvas.drawLine(startX, startY, 595 - leftMargin, startY, paint);
-        startY += lineHeight;
-
-        // Obtener detalles de los productos
-        List<Map<String, String>> detalles = nDetalleOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
-        if (detalles != null && !detalles.isEmpty()) {
-            for (Map<String, String> detalle : detalles) {
-                // Dibujar detalles del producto alineados con los encabezados
-                canvas.drawText(detalle.get("idProducto"), startX, startY, paint);
-                canvas.drawText(detalle.get("nombre"), startX + 50, startY, paint);
-                canvas.drawText(detalle.get("cantidad"), startX + 200, startY, paint);
-                canvas.drawText(detalle.get("precio") + " Bs", startX + 300, startY, paint);
-                canvas.drawText(detalle.get("monto") + " Bs", startX + 400, startY, paint);
-
-                // Cargar la imagen si está disponible
-                String imagenPath = detalle.get("imagenPath");
-                if (imagenPath != null && !imagenPath.isEmpty()) {
-                    try {
-                        Uri imageUri = Uri.parse(imagenPath);
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 50, 50, false);
-                        canvas.drawBitmap(scaledBitmap, startX + 500, startY - 25, paint);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // Mover el cursor a la siguiente fila
-                startY += lineHeight * 2;
-
-                // Si la página está llena, crear una nueva
-                if (startY > 800) {
-                    pdfDocument.finishPage(page);
-                    pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-                    page = pdfDocument.startPage(pageInfo);
-                    canvas = page.getCanvas();
-                    startY = topMargin;
-                }
-            }
-        } else {
-            canvas.drawText("No hay productos en esta orden.", startX, startY, paint);
-        }
-
-        // Terminar página actual
-        pdfDocument.finishPage(page);
-
-        try {
-            OutputStream outputStream = getContentResolver().openOutputStream(uri);
-            pdfDocument.writeTo(outputStream);
-            outputStream.close();
-            Toast.makeText(this, "PDF guardado con éxito", Toast.LENGTH_SHORT).show();
-
-            abrirPDF(uri);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error al guardar PDF", Toast.LENGTH_SHORT).show();
-        }
-
-        // Cerrar el documento PDF
-        pdfDocument.close();
-    }
-
-    // Método para abrir el PDF inmediatamente después de guardarlo
-    private void abrirPDF(Uri pdfUri) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(pdfUri, "application/pdf");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        try {
-            startActivity(intent);
-        } catch (Exception e) {
-            Toast.makeText(this, "No se pudo abrir el archivo PDF", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // Método para generar el PDF y luego enviarlo por WhatsApp
-    private void enviarPDFWhatsApp() {
-        // Generar el PDF sin solicitar al usuario una ubicación y luego compartirlo por WhatsApp
-        generarPDFParaWhatsApp();
-    }
-
-    // Método para generar el PDF y guardarlo temporalmente para enviar por WhatsApp
-    private void generarPDFParaWhatsApp() {
-        // Crear un archivo temporal para el PDF
-        File pdfFile = new File(getExternalFilesDir(null), "Detalle_Orden_" + idOrdenSeleccionada + ".pdf");
-
-        // Obtener la URI del archivo utilizando FileProvider
-        Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", pdfFile);
-
-        PdfDocument pdfDocument = new PdfDocument();
-        Paint paint = new Paint();
-        Paint titlePaint = new Paint();
-        titlePaint.setTextSize(16);
-        titlePaint.setFakeBoldText(true);
-
-        // Página 1 (Tamaño A4: 595 x 842 puntos)
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
-
-        // Obtener el Canvas para dibujar
-        Canvas canvas = page.getCanvas();
-
-        // Definir márgenes
-        int leftMargin = 30;
-        int topMargin = 30;
-
-        // Definir posiciones iniciales (teniendo en cuenta los márgenes)
-        int startX = leftMargin;
-        int startY = topMargin;
-        int lineHeight = 20; // Altura de cada línea
-
-        // Obtener los datos de la orden (incluyendo fecha y total)
-        Map<String, String> datosOrden = nOrden.obtenerDatosOrden(idOrdenSeleccionada);
-        String fechaOrden = datosOrden.get("fecha");
-        String totalOrden = datosOrden.get("total");
-
-        // Dibujar encabezado: Orden de compra y datos del cliente
-        canvas.drawText("ORDEN DE COMPRA: #" + idOrdenSeleccionada, startX, startY, titlePaint);
-
-        // Mostrar la fecha y total
-        startY += lineHeight;
-        canvas.drawText("Fecha: " + (fechaOrden != null ? fechaOrden : "No disponible"), startX, startY, paint);
-        canvas.drawText("Total: " + (totalOrden != null ? totalOrden + " Bs" : "No disponible"), startX + 350, startY, paint);
-
-        // Obtener los datos del cliente y mostrar
-        startY += lineHeight;
-        Map<String, String> datosCliente = nOrden.obtenerDatosCliente(idOrdenSeleccionada);
-        if (datosCliente != null) {
-            canvas.drawText("Cliente: " + datosCliente.get("nombre"), startX, startY, paint);
-            startY += lineHeight;
-            canvas.drawText("Teléfono: " + datosCliente.get("nroTelefono"), startX, startY, paint);
-
-            // Si hay imagen del cliente
-            String imagenPath = datosCliente.get("imagenPath");
-            if (imagenPath != null && !imagenPath.isEmpty()) {
-                try {
-                    Uri imageUri = Uri.parse(imagenPath);
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 100, 100, false);
-                    canvas.drawBitmap(scaledBitmap, startX + 450, startY - 60, paint);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            canvas.drawText("Cliente: Información no disponible", startX, startY, paint);
-        }
-
-        // Espacio para la lista de productos
-        startY += 2 * lineHeight;
-        canvas.drawText("Lista de Productos:", startX, startY, titlePaint);
-
-        // Dibujar encabezados de la tabla
-        startY += lineHeight;
-        canvas.drawText("ID", startX, startY, paint);
-        canvas.drawText("Nombre", startX + 50, startY, paint);
-        canvas.drawText("Cantidad", startX + 200, startY, paint);
-        canvas.drawText("Precio", startX + 300, startY, paint);
-        canvas.drawText("Monto", startX + 400, startY, paint);
-        canvas.drawText("Imagen", startX + 500, startY, paint);
-
-        // Línea separadora
-        startY += lineHeight;
-        canvas.drawLine(startX, startY, 595 - leftMargin, startY, paint);
-        startY += lineHeight;
-
-        // Obtener detalles de los productos
-        List<Map<String, String>> detalles = nDetalleOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
-        if (detalles != null && !detalles.isEmpty()) {
-            for (Map<String, String> detalle : detalles) {
-                // Dibujar detalles del producto alineados con los encabezados
-                canvas.drawText(detalle.get("idProducto"), startX, startY, paint);
-                canvas.drawText(detalle.get("nombre"), startX + 50, startY, paint);
-                canvas.drawText(detalle.get("cantidad"), startX + 200, startY, paint);
-                canvas.drawText(detalle.get("precio") + " Bs", startX + 300, startY, paint);
-                canvas.drawText(detalle.get("monto") + " Bs", startX + 400, startY, paint);
-
-                // Cargar la imagen si está disponible
-                String imagenPath = detalle.get("imagenPath");
-                if (imagenPath != null && !imagenPath.isEmpty()) {
-                    try {
-                        Uri imageUri = Uri.parse(imagenPath);
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 50, 50, false);
-                        canvas.drawBitmap(scaledBitmap, startX + 500, startY - 25, paint);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // Mover el cursor a la siguiente fila
-                startY += lineHeight * 2;
-
-                // Si la página está llena, crear una nueva
-                if (startY > 800) {
-                    pdfDocument.finishPage(page);
-                    pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
-                    page = pdfDocument.startPage(pageInfo);
-                    canvas = page.getCanvas();
-                    startY = topMargin;
-                }
-            }
-        } else {
-            canvas.drawText("No hay productos en esta orden.", startX, startY, paint);
-        }
-
-        // Terminar página actual
-        pdfDocument.finishPage(page);
-
-        // Guardar el archivo PDF en el archivo temporal
-        try {
-            FileOutputStream outputStream = new FileOutputStream(pdfFile);
-            pdfDocument.writeTo(outputStream);
-            outputStream.close();
-
-            Toast.makeText(this, "PDF generado correctamente", Toast.LENGTH_SHORT).show();
-
-            // Después de generar el PDF, compartir por WhatsApp
-            enviarPDFWhatsApp(pdfUri, datosCliente.get("nroTelefono"));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error al generar el PDF", Toast.LENGTH_SHORT).show();
-        }
-
-        // Cerrar el documento PDF
-        pdfDocument.close();
-    }
-
-    private void enviarPDFWhatsApp(Uri pdfUri, String numeroCliente) {
-
-        if (numeroCliente != null && !numeroCliente.isEmpty()) {
-            String numeroFormateado = "591" + numeroCliente.replace(" ", "").replace("-", "");
-
-            Intent sendIntent = new Intent(Intent.ACTION_SEND);
-            sendIntent.setType("application/pdf");
-            sendIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
-            sendIntent.putExtra("jid", numeroFormateado + "@s.whatsapp.net");
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            sendIntent.setPackage("com.whatsapp");
-
-            try {
-                startActivity(sendIntent);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(this, "WhatsApp no está instalado en este dispositivo", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Toast.makeText(this, "Número de teléfono del cliente no disponible.", Toast.LENGTH_SHORT).show();
-        }
     }
 }

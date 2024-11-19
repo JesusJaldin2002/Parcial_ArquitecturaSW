@@ -125,8 +125,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (!datosClientesExistentes) {
             // Insertar datos de ejemplo para clientes con imágenes
-            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 1', '123456789', 'android.resource://com.example.primerparcial/drawable/cliente1')");
-            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 2', '987654321', 'android.resource://com.example.primerparcial/drawable/cliente2')");
+            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 1', '73982631', 'android.resource://com.example.primerparcial/drawable/cliente1')");
+            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 2', '71396966', 'android.resource://com.example.primerparcial/drawable/cliente2')");
         }
 
         if (!datosCategoriasExistentes) {
