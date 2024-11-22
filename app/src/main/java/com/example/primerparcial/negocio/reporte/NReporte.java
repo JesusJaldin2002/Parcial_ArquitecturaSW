@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class NReporte {
-    private DReporte dReporte;
+    private final DReporte dReporte;
 
     public NReporte(Context context) {
         this.dReporte = new DReporte(context);
@@ -59,7 +59,7 @@ public class NReporte {
                         resultado.append("  No hay productos asociados.\n");
                     }
 
-                    resultado.append("\n"); // Separador entre órdenes
+                    resultado.append("\n");
                 } while (cursor.moveToNext());
 
                 // Mostrar el total global
@@ -67,8 +67,11 @@ public class NReporte {
                 resultado.append("Total de órdenes: ").append(totalOrdenes).append("\n");
                 resultado.append("Suma total de todas las órdenes: Bs ").append(totalGlobal).append("\n");
             } else {
-                resultado.append("No se encontraron órdenes en el rango de fechas especificado.\n");
+                resultado.append("No se encontraron " +
+                        "órdenes en el rango de fechas especificado.\n");
             }
+
+            assert cursor != null;
             cursor.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,13 +100,15 @@ public class NReporte {
                     // Obtener los datos de cada categoría
                     String categoria = cursor.getString(cursor.getColumnIndexOrThrow("categoria_nombre"));
                     double totalSum = cursor.getDouble(cursor.getColumnIndexOrThrow("total_sum"));
+                    int totalProductos = cursor.getInt(cursor.getColumnIndexOrThrow("total_productos")); // Cantidad total de productos
 
                     // Sumar al total global
                     totalGlobal += totalSum;
 
                     // Mostrar detalles de la categoría
                     resultado.append("Categoría: ").append(categoria).append("\n")
-                            .append("Total: Bs ").append(totalSum).append("\n")
+                            .append("Total ingresos: Bs ").append(totalSum).append("\n")
+                            .append("Productos vendidos: ").append(totalProductos).append("\n")
                             .append("--------------------------------------------------\n");
                 } while (cursor.moveToNext());
 
@@ -111,7 +116,8 @@ public class NReporte {
                 resultado.append("\n====================================\n");
                 resultado.append("Total acumulado de todas las categorías: Bs ").append(totalGlobal).append("\n");
             } else {
-                resultado.append("No se encontraron resultados para las categorías en el rango de fechas especificado.\n");
+                resultado.append("No se encontraron " +
+                        "resultados para las categorías en el rango de fechas especificado.\n");
             }
             cursor.close();
         } catch (Exception e) {
@@ -142,13 +148,15 @@ public class NReporte {
                     // Obtener los datos de cada producto
                     String producto = cursor.getString(cursor.getColumnIndexOrThrow("producto_nombre"));
                     double totalSum = cursor.getDouble(cursor.getColumnIndexOrThrow("total_sum"));
+                    int unidadesVendidas = cursor.getInt(cursor.getColumnIndexOrThrow("unidades_vendidas"));
 
                     // Sumar al total global
                     totalGlobal += totalSum;
 
                     // Mostrar detalles del producto
                     resultado.append("Producto: ").append(producto).append("\n")
-                            .append("Total: Bs ").append(totalSum).append("\n")
+                            .append("Total ingresos: Bs ").append(totalSum).append("\n")
+                            .append("Unidades vendidas: ").append(unidadesVendidas).append("\n")
                             .append("--------------------------------------------------\n");
                 } while (cursor.moveToNext());
 
@@ -156,8 +164,11 @@ public class NReporte {
                 resultado.append("\n====================================\n");
                 resultado.append("Total acumulado de todos los productos: Bs ").append(totalGlobal).append("\n");
             } else {
-                resultado.append("No se encontraron resultados para los productos en el rango de fechas especificado.\n");
+                resultado.append("No se encontraron resultados " +
+                        "para los productos en el rango de fechas especificado.\n");
             }
+
+            assert cursor != null;
             cursor.close();
         } catch (Exception e) {
             e.printStackTrace();
