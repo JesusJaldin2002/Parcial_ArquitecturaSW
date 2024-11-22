@@ -65,7 +65,7 @@ public class DCatalogo {
         this.descripcion = descripcion;
     }
 
-    // Método para cargar los datos de un catálogo a partir de un Cursor
+    // Métodos originales de DCatalogo
     public void cargarDesdeCursor(Cursor cursor) {
         this.id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
         this.nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre"));
@@ -73,7 +73,6 @@ public class DCatalogo {
         this.descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion"));
     }
 
-    // Método para insertar un catálogo
     public void insertarCatalogo(String nombre, String fecha, String descripcion) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -84,36 +83,25 @@ public class DCatalogo {
         db.close();
     }
 
-    // Método para obtener todos los catálogos
     public Cursor obtenerCatalogos() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         return db.rawQuery("SELECT id, nombre, fecha, descripcion FROM catalogos", null);
     }
 
-    // Método para actualizar un catálogo
     public void actualizarCatalogo(String id, String nombre, String fecha, String descripcion) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("nombre", nombre);
         values.put("fecha", fecha);
         values.put("descripcion", descripcion);
-
-        // Actualizamos el catálogo donde el ID coincida
-        String[] args = { id };
-        db.update("catalogos", values, "id=?", args);
+        db.update("catalogos", values, "id=?", new String[]{id});
         db.close();
     }
 
-    // Método para eliminar un catálogo
     public void eliminarCatalogo(String id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        // Eliminar los productos asociados al catálogo
-        db.delete("catalogoProducto", "idCatalogo=?", new String[]{id});
-
-        // Eliminar el catálogo
-        db.delete("catalogos", "id=?", new String[]{id});
-
+        db.delete("catalogoProducto", "idCatalogo=?", new String[]{id}); // Eliminar productos asociados
+        db.delete("catalogos", "id=?", new String[]{id}); // Eliminar catálogo
         db.close();
     }
 
@@ -123,7 +111,6 @@ public class DCatalogo {
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idCatalogo)});
 
         Map<String, String> catalogoData = new HashMap<>();
-
         if (cursor.moveToFirst()) {
             catalogoData.put("nombre", cursor.getString(cursor.getColumnIndexOrThrow("nombre")));
             catalogoData.put("fecha", cursor.getString(cursor.getColumnIndexOrThrow("fecha")));
@@ -133,5 +120,61 @@ public class DCatalogo {
         cursor.close();
         db.close();
         return catalogoData;
+    }
+
+    // Métodos añadidos de DCatalogoProducto
+    public void insertarCatalogoProducto(int idCatalogo, int idProducto, String nota) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("idCatalogo", idCatalogo);
+        values.put("idProducto", idProducto);
+        values.put("nota", nota);
+        db.insert("catalogoProducto", null, values);
+        db.close();
+    }
+
+    public Cursor obtenerProductosPorCatalogo(int idCatalogo) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT * FROM catalogoProducto WHERE idCatalogo = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(idCatalogo)});
+    }
+
+    public Cursor obtenerProductosPorCatalogoConCategorias(int idCatalogo) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT cp.idCatalogo, cp.idProducto, p.id, p.nombre, p.descripcion, p.precio, p.imagenPath, p.stock, c.nombre AS categoria, cp.nota " +
+                "FROM productos p " +
+                "JOIN categorias c ON p.idCategoria = c.id " +
+                "JOIN catalogoProducto cp ON p.id = cp.idProducto " +
+                "WHERE cp.idCatalogo = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(idCatalogo)});
+    }
+
+    public void eliminarProductoCatalogo(int idCatalogo, int idProducto) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete("catalogoProducto", "idCatalogo=? AND idProducto=?", new String[]{String.valueOf(idCatalogo), String.valueOf(idProducto)});
+        db.close();
+    }
+
+    public boolean productoYaEnCatalogo(int idCatalogo, int idProducto) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM catalogoProducto WHERE idCatalogo = ? AND idProducto = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(idCatalogo), String.valueOf(idProducto)});
+
+        boolean existe = false;
+        if (cursor.moveToFirst()) {
+            existe = cursor.getInt(0) > 0;
+        }
+        cursor.close();
+        db.close();
+
+        return existe;
+    }
+
+    public void actualizarNotaProducto(int idCatalogo, int idProducto, String nuevaNota) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("nota", nuevaNota);
+        db.update("catalogoProducto", values, "idCatalogo = ? AND idProducto = ?", new String[]{String.valueOf(idCatalogo), String.valueOf(idProducto)});
+        db.close();
     }
 }

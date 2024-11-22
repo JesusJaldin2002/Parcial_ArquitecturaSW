@@ -1,4 +1,4 @@
-package com.example.primerparcial.presentacion.detalleOrden.strategy;
+package com.example.primerparcial.presentacion.orden.strategy;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -28,8 +28,13 @@ public class JPGStrategy implements DocumentStrategy {
     }
 
     @Override
-    public Uri generateDocument(int orderId, Map<String, String> orderData,
-                                Map<String, String> clientData, List<Map<String, String>> orderDetails) {
+    public Uri generateDocument(
+            int orderId,
+            Map<String, String> orderData,
+
+            Map<String, String> clientData,
+            List<Map<String, String>> orderDetails) {
+
         List<Uri> imageUris = new ArrayList<>();
         int pageCount = 1;
         File jpgFile;

@@ -25,10 +25,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.primerparcial.MainActivity;
 import com.example.primerparcial.R;
 import com.example.primerparcial.negocio.catalogo.NCatalogo;
-import com.example.primerparcial.negocio.catalogoProducto.NCatalogoProducto;
 import com.example.primerparcial.negocio.categoria.NCategoria;
 import com.example.primerparcial.negocio.producto.NProducto;
-import com.example.primerparcial.presentacion.catalogoProducto.PCatalogoProducto;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -44,7 +42,6 @@ public class PCatalogo extends AppCompatActivity {
     private NCatalogo nCatalogo;
     private NCategoria nCategoria;
     private NProducto nProducto;
-    private NCatalogoProducto nCatalogoProducto;
     private View gestionarCatalogoView;
     private View listarCatalogosView;
     private View anadirProductoView;
@@ -72,7 +69,6 @@ public class PCatalogo extends AppCompatActivity {
         nCatalogo = new NCatalogo(this);
         nCategoria = new NCategoria(this);
         nProducto = new NProducto(this);
-        nCatalogoProducto = new NCatalogoProducto(this);
 
         // Inicializar las vistas del layout de gestionar catálogos
         etNombreCatalogo = findViewById(R.id.etNombreCatalogo);
@@ -223,7 +219,7 @@ public class PCatalogo extends AppCompatActivity {
             int idProducto = Integer.parseInt(productoSeleccionado.get("id"));
 
             // Verificar si el producto ya está en el catálogo
-            if (nCatalogoProducto.productoYaEnCatalogo(idCatalogo, idProducto)) {
+            if (nCatalogo.productoYaEnCatalogo(idCatalogo, idProducto)) {
                 Toast.makeText(this, "El producto ya está en el catálogo", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -232,7 +228,7 @@ public class PCatalogo extends AppCompatActivity {
             String nota = etNotaProducto.getText().toString().trim();
 
             // Registrar el producto en el catálogo
-            nCatalogoProducto.registrarProductoCatalogo(idCatalogo, idProducto, nota);
+            nCatalogo.registrarProductoCatalogo(idCatalogo, idProducto, nota);
 
             // Mostrar mensaje de confirmación
             Toast.makeText(this, "Producto añadido al catálogo", Toast.LENGTH_SHORT).show();

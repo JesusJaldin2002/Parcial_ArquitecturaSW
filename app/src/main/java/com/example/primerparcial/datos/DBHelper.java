@@ -122,11 +122,16 @@ public class DBHelper extends SQLiteOpenHelper {
         boolean datosClientesExistentes = hayDatosEnTabla(db, "clientes");
         boolean datosCategoriasExistentes = hayDatosEnTabla(db, "categorias");
         boolean datosProductosExistentes = hayDatosEnTabla(db, "productos");
+        boolean datosRepartidoresExistentes = hayDatosEnTabla(db, "repartidores");
+        boolean datosPosicionesExistentes = hayDatosEnTabla(db, "posiciones");
+
 
         if (!datosClientesExistentes) {
             // Insertar datos de ejemplo para clientes con imágenes
-            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 1', '73982631', 'android.resource://com.example.primerparcial/drawable/cliente1')");
-            db.execSQL("INSERT INTO clientes (nombre, nroTelefono, imagenPath) VALUES ('Cliente 2', '71396966', 'android.resource://com.example.primerparcial/drawable/cliente2')");
+            db.execSQL("INSERT INTO clientes " +
+                    "(nombre, nroTelefono, imagenPath) VALUES ('Rodrigo Jaldin', '73982631', 'android.resource://com.example.primerparcial/drawable/cliente1')");
+            db.execSQL("INSERT INTO clientes " +
+                    "(nombre, nroTelefono, imagenPath) VALUES ('Jesus Jaldin', '71396966', 'android.resource://com.example.primerparcial/drawable/cliente2')");
         }
 
         if (!datosCategoriasExistentes) {
@@ -156,6 +161,27 @@ public class DBHelper extends SQLiteOpenHelper {
             db.execSQL("INSERT INTO productos (nombre, descripcion, precio, imagenPath, stock, idCategoria) VALUES ('Zapato 3', 'Descripción Zapato 1', 75.0, 'android.resource://com.example.primerparcial/drawable/zapato3', 10, 2)");
             db.execSQL("INSERT INTO productos (nombre, descripcion, precio, imagenPath, stock, idCategoria) VALUES ('Zapato 4', 'Descripción Zapato 1', 125.0, 'android.resource://com.example.primerparcial/drawable/zapato4', 10, 2)");
 
+        }
+
+        if (!datosRepartidoresExistentes) {
+            // Insertar datos de ejemplo para repartidores
+            db.execSQL("INSERT INTO repartidores (nombre, nroTelefono) VALUES ('Milton Jaldin', '71396966')");
+            db.execSQL("INSERT INTO repartidores (nombre, nroTelefono) VALUES ('Sarely Columba', '63588838')");
+        }
+
+        if (!datosPosicionesExistentes) {
+            // Insertar posiciones para los clientes
+            Cursor cursorClientes = db.rawQuery("SELECT id FROM clientes", null);
+            if (cursorClientes.moveToFirst()) {
+                do {
+                    int idCliente = cursorClientes.getInt(0);
+
+                    // Insertar una posición para cada cliente
+                    db.execSQL("INSERT INTO posiciones (nombre, urlMapa, referencia, idCliente) VALUES " +
+                            "('Ubicación Cliente " + idCliente + "', 'http://maps.google.com/?q=-17.3935,-66.1456', 'Referencia Cliente " + idCliente + "', " + idCliente + ")");
+                } while (cursorClientes.moveToNext());
+            }
+            cursorClientes.close();
         }
 
     }

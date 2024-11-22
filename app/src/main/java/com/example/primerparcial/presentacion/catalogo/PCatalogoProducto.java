@@ -1,4 +1,4 @@
-package com.example.primerparcial.presentacion.catalogoProducto;
+package com.example.primerparcial.presentacion.catalogo;
 
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -26,8 +26,6 @@ import androidx.core.content.FileProvider;
 
 import com.example.primerparcial.R;
 import com.example.primerparcial.negocio.catalogo.NCatalogo;
-import com.example.primerparcial.negocio.catalogoProducto.NCatalogoProducto;
-import com.example.primerparcial.negocio.producto.NProducto;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,15 +33,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PCatalogoProducto extends AppCompatActivity {
 
     private static final int CREATE_FILE = 1;
 
-    private NCatalogoProducto nCatalogoProducto;
     private NCatalogo nCatalogo;
-    private NProducto nProducto;
     private View listaCatalogoProductoView;
     private int idCatalogo;
 
@@ -57,8 +54,6 @@ public class PCatalogoProducto extends AppCompatActivity {
         idCatalogo = getIntent().getIntExtra("idCatalogo", -1);
 
         // Inicializar las clases de negocio
-        nCatalogoProducto = new NCatalogoProducto(this);
-        nProducto = new NProducto(this);
         nCatalogo = new NCatalogo(this);
 
         // Verificar si el ID del catálogo es válido
@@ -88,7 +83,7 @@ public class PCatalogoProducto extends AppCompatActivity {
         listaCategoriasLayout.removeAllViews();
 
         // Obtener productos del catálogo desde la capa de negocio
-        Map<String, List<Map<String, String>>> productosPorCategoria = nCatalogoProducto.obtenerProductosPorCategoriaCatalogo(idCatalogo);
+        Map<String, List<Map<String, String>>> productosPorCategoria = nCatalogo.obtenerProductosPorCategoriaCatalogo(idCatalogo);
 
         // Recorrer las categorías y sus productos
         for (String categoria : productosPorCategoria.keySet()) {
@@ -201,7 +196,7 @@ public class PCatalogoProducto extends AppCompatActivity {
 
             if (!nuevaNota.isEmpty()) {
                 // Llamar a la capa de negocio para actualizar la nota del producto
-                nCatalogoProducto.actualizarNotaProducto(idCatalogo, Integer.parseInt(producto.get("idProducto")), nuevaNota);
+                nCatalogo.actualizarNotaProducto(idCatalogo, Integer.parseInt(Objects.requireNonNull(producto.get("idProducto"))), nuevaNota);
 
                 // Mostrar un mensaje de éxito
                 Toast.makeText(PCatalogoProducto.this, "Nota del producto actualizada", Toast.LENGTH_SHORT).show();
@@ -318,7 +313,7 @@ public class PCatalogoProducto extends AppCompatActivity {
         startY[0] += lineHeight;
 
         // Obtener productos por categoría
-        Map<String, List<Map<String, String>>> productosPorCategoria = nCatalogoProducto.obtenerProductosPorCategoriaCatalogo(idCatalogo);
+        Map<String, List<Map<String, String>>> productosPorCategoria = nCatalogo.obtenerProductosPorCategoriaCatalogo(idCatalogo);
 
         for (String categoria : productosPorCategoria.keySet()) {
             // Verificar si hay suficiente espacio en la página actual
@@ -478,7 +473,7 @@ public class PCatalogoProducto extends AppCompatActivity {
         startY[0] += lineHeight;
 
         // Obtener productos por categoría
-        Map<String, List<Map<String, String>>> productosPorCategoria = nCatalogoProducto.obtenerProductosPorCategoriaCatalogo(idCatalogo);
+        Map<String, List<Map<String, String>>> productosPorCategoria = nCatalogo.obtenerProductosPorCategoriaCatalogo(idCatalogo);
 
         for (String categoria : productosPorCategoria.keySet()) {
             // Verificar si hay suficiente espacio en la página actual
@@ -586,7 +581,7 @@ public class PCatalogoProducto extends AppCompatActivity {
         Button btnSi = dialog.findViewById(R.id.btnSi);
         btnSi.setOnClickListener(v -> {
             // Llamar a la capa de negocio para eliminar el producto del catálogo
-            nCatalogoProducto.eliminarProductoCatalogo(idCatalogo, idProducto);
+            nCatalogo.eliminarProductoCatalogo(idCatalogo, idProducto);
 
             // Mostrar mensaje de éxito
             Toast.makeText(this, "Producto eliminado del catálogo", Toast.LENGTH_SHORT).show();

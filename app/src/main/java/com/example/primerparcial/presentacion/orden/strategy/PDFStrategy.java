@@ -1,4 +1,4 @@
-package com.example.primerparcial.presentacion.detalleOrden.strategy;
+package com.example.primerparcial.presentacion.orden.strategy;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -28,8 +28,12 @@ public class PDFStrategy implements DocumentStrategy {
     }
 
     @Override
-    public Uri generateDocument(int orderId, Map<String, String> orderData,
-                                Map<String, String> clientData, List<Map<String, String>> orderDetails) {
+    public Uri generateDocument(
+            int orderId,
+            Map<String, String> orderData,
+            Map<String, String> clientData,
+            List<Map<String, String>> orderDetails) {
+
         File pdfFile = new File(context.getExternalFilesDir(null), "Detalle_Orden_" + orderId + ".pdf");
         PdfDocument pdfDocument = new PdfDocument();
         Paint paint = new Paint();

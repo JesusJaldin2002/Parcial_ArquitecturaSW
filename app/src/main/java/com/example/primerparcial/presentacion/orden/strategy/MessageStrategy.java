@@ -1,4 +1,4 @@
-package com.example.primerparcial.presentacion.detalleOrden.strategy;
+package com.example.primerparcial.presentacion.orden.strategy;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -18,8 +18,12 @@ public class MessageStrategy implements DocumentStrategy {
     }
 
     @Override
-    public Uri generateDocument(int orderId, Map<String, String> orderData,
-                                Map<String, String> clientData, List<Map<String, String>> orderDetails) {
+    public Uri generateDocument(
+            int orderId,
+            Map<String, String> orderData,
+            Map<String, String> clientData,
+            List<Map<String, String>> orderDetails) {
+
         // Generar mensaje de texto basado en los datos de la orden
         StringBuilder messageBuilder = new StringBuilder();
 

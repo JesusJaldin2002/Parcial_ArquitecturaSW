@@ -1,4 +1,4 @@
-package com.example.primerparcial.presentacion.detalleOrden;
+package com.example.primerparcial.presentacion.orden;
 
 import java.util.List;
 import java.util.Map;

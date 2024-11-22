@@ -1,5 +1,6 @@
-package com.example.primerparcial.presentacion.detalleOrden;
+package com.example.primerparcial.presentacion.orden;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,15 +20,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.primerparcial.R;
-import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
 import com.example.primerparcial.negocio.orden.NOrden;
 import com.example.primerparcial.negocio.producto.NProducto;
-import com.example.primerparcial.presentacion.detalleOrden.strategy.DocumentContext;
-import com.example.primerparcial.presentacion.detalleOrden.strategy.DocumentStrategy;
-import com.example.primerparcial.presentacion.detalleOrden.strategy.JPGStrategy;
-import com.example.primerparcial.presentacion.detalleOrden.strategy.MessageStrategy;
-import com.example.primerparcial.presentacion.detalleOrden.strategy.PDFStrategy;
-import com.example.primerparcial.presentacion.detalleOrden.strategy.XLSXStrategy;
+import com.example.primerparcial.presentacion.orden.strategy.DocumentContext;
+import com.example.primerparcial.presentacion.orden.strategy.DocumentStrategy;
+import com.example.primerparcial.presentacion.orden.strategy.JPGStrategy;
+import com.example.primerparcial.presentacion.orden.strategy.MessageStrategy;
+import com.example.primerparcial.presentacion.orden.strategy.PDFStrategy;
+import com.example.primerparcial.presentacion.orden.strategy.XLSXStrategy;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,62 +35,69 @@ import java.util.Map;
 
 public class PDetalleOrden extends AppCompatActivity {
 
-        private NDetalleOrden nDetalleOrden;
-        private NOrden nOrden;
-        private NProducto nProducto;
-        private LinearLayout listaProductosLayout;
-        private TextView tvMontoTotal;
-        private int idOrdenSeleccionada;
-        private DocumentContext documentContext;
+    private NOrden nOrden;
+    private NProducto nProducto;
+    private LinearLayout listaProductosLayout;
+    private TextView tvMontoTotal;
+    private int idOrdenSeleccionada;
+    private DocumentContext documentContext;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_detalle_orden);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detalle_orden);
 
-            nDetalleOrden = new NDetalleOrden(this);
-            nOrden = new NOrden(this);
-            nProducto = new NProducto(this);
-            documentContext = new DocumentContext(this);
+        nOrden = new NOrden(this);
+        nProducto = new NProducto(this);
+        documentContext = new DocumentContext(this);
 
-            // Recibir el id de la orden
-            Intent intent = getIntent();
-            idOrdenSeleccionada = intent.getIntExtra("idOrden", -1);
+        // Recibir el id de la orden
+        Intent intent = getIntent();
+        idOrdenSeleccionada = intent.getIntExtra("idOrden", -1);
 
-            if (idOrdenSeleccionada != -1) {
-                mostrarDetalleOrden();
-            }
-
-            Button btnGenerarPDF = findViewById(R.id.btnGenerarPdf);
-            btnGenerarPDF.setOnClickListener(v -> ejecutarEstrategia(new PDFStrategy(this)));
-
-            Button btnGenerarJPG = findViewById(R.id.btnGenerarJpg);
-            btnGenerarJPG.setOnClickListener(v -> ejecutarEstrategia(new JPGStrategy(this)));
-
-            Button btnGenerarExcel = findViewById(R.id.btnGenerarExcel);
-            btnGenerarExcel.setOnClickListener(v -> ejecutarEstrategia(new XLSXStrategy(this)));
-
-            Button btnGenerarMensaje = findViewById(R.id.btnGenerarMensaje);
-            btnGenerarMensaje.setOnClickListener(v -> ejecutarEstrategia(new MessageStrategy(this)));
-
-            Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
-            btnVolverAtras.setOnClickListener(v -> finish());
+        if (idOrdenSeleccionada != -1) {
+            mostrarDetalleOrden();
         }
+
+        Button btnGenerarPDF = findViewById(R.id.btnGenerarPdf);
+        btnGenerarPDF.setOnClickListener(v ->
+                ejecutarEstrategia(new PDFStrategy(this)));
+
+        Button btnGenerarJPG = findViewById(R.id.btnGenerarJpg);
+        btnGenerarJPG.setOnClickListener(v ->
+                ejecutarEstrategia(new JPGStrategy(this)));
+
+        Button btnGenerarExcel = findViewById(R.id.btnGenerarExcel);
+        btnGenerarExcel.setOnClickListener(v ->
+                ejecutarEstrategia(new XLSXStrategy(this)));
+
+        Button btnGenerarMensaje = findViewById(R.id.btnGenerarMensaje);
+        btnGenerarMensaje.setOnClickListener(v ->
+                ejecutarEstrategia(new MessageStrategy(this)));
+
+        Button btnVolverAtras = findViewById(R.id.btnVolverAtras);
+        btnVolverAtras.setOnClickListener(v ->
+                finish());
+    }
 
     private void ejecutarEstrategia(DocumentStrategy strategy) {
         documentContext.setStrategy(strategy);
 
-        // Obtén los datos desglosados
+        // Obtén los datos
         int orderId = idOrdenSeleccionada;
-        Map<String, String> orderData = nOrden.obtenerDatosOrden(idOrdenSeleccionada);
-        Map<String, String> clientData = nOrden.obtenerDatosCliente(idOrdenSeleccionada);
-        List<Map<String, String>> orderDetails = nDetalleOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
+        Map<String, String> orderData =
+                nOrden.obtenerDatosOrden(idOrdenSeleccionada);
+        Map<String, String> clientData =
+                nOrden.obtenerDatosCliente(idOrdenSeleccionada);
+        List<Map<String, String>> orderDetails =
+                nOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
 
-        // Llama a documentContext con datos desglosados
+        // Llama a documentContext con datos
         documentContext.executeStrategy(orderId, orderData, clientData, orderDetails);
     }
 
     // Método para mostrar los detalles de la orden
+    @SuppressLint("SetTextI18n")
     private void mostrarDetalleOrden() {
         TextView tvDetalleOrdenTitulo = findViewById(R.id.tvDetalleOrdenTitulo);
         tvDetalleOrdenTitulo.setText("Detalle de la Orden #" + idOrdenSeleccionada);
@@ -106,7 +113,7 @@ public class PDetalleOrden extends AppCompatActivity {
         // Limpiar el layout de productos antes de volver a cargar
         listaProductosLayout.removeAllViews();
 
-        List<Map<String, String>> detalles = nDetalleOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
+        List<Map<String, String>> detalles = nOrden.obtenerDetallesPorOrden(idOrdenSeleccionada);
 
         for (Map<String, String> detalle : detalles) {
             View itemView = getLayoutInflater().inflate(R.layout.item_detalle_orden, null);
@@ -202,7 +209,7 @@ public class PDetalleOrden extends AppCompatActivity {
                 }
 
                 // Actualizar la cantidad en la base de datos
-                nDetalleOrden.actualizarCantidadDetalleOrden(
+                nOrden.actualizarCantidadDetalleOrden(
                         idOrdenSeleccionada,
                         idProducto,
                         nuevaCantidad,
@@ -257,7 +264,7 @@ public class PDetalleOrden extends AppCompatActivity {
         Button btnSi = dialog.findViewById(R.id.btnSi);
         btnSi.setOnClickListener(v -> {
             // Eliminar el detalle de la orden y actualizar la vista
-            nDetalleOrden.eliminarDetalleOrden(idOrden, idProducto, cantidad, totalDetalle);
+            nOrden.eliminarDetalleOrden(idOrden, idProducto, cantidad, totalDetalle);
             listaProductosLayout.removeView(itemView);
             actualizarMontoTotal();
 

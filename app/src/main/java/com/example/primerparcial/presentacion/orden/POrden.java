@@ -30,11 +30,9 @@ import com.example.primerparcial.MainActivity;
 import com.example.primerparcial.R;
 import com.example.primerparcial.negocio.categoria.NCategoria;
 import com.example.primerparcial.negocio.cliente.NCliente;
-import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
 import com.example.primerparcial.negocio.orden.NOrden;
 import com.example.primerparcial.negocio.producto.NProducto;
 import com.example.primerparcial.negocio.repartidor.NRepartidor;
-import com.example.primerparcial.presentacion.detalleOrden.PDetalleOrden;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -51,7 +49,6 @@ public class POrden extends AppCompatActivity {
     private NCliente nCliente;
     private NProducto nProducto;
     private NCategoria nCategoria;
-    private NDetalleOrden nDetalleOrden;
     private NRepartidor nRepartidor;
 
     private EditText etFechaOrden, etCantidad, etPrecio;
@@ -77,7 +74,6 @@ public class POrden extends AppCompatActivity {
         nCliente = new NCliente(this);
         nProducto = new NProducto(this);
         nCategoria = new NCategoria(this);
-        nDetalleOrden = new NDetalleOrden(this);
         nRepartidor = new NRepartidor(this);
 
         etFechaOrden = findViewById(R.id.etFechaOrden);
@@ -288,13 +284,13 @@ public class POrden extends AppCompatActivity {
             }
 
             // Verificar si el producto ya existe en la orden
-            if (nDetalleOrden.verificarProductoEnOrden(idOrdenSeleccionada, idProducto)) {
+            if (nOrden.verificarProductoEnOrden(idOrdenSeleccionada, idProducto)) {
                 Toast.makeText(this, "El producto ya está en la orden", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // Insertar el detalle de la orden
-            nDetalleOrden.registrarDetalleOrden(cantidad, precio, idOrdenSeleccionada, idProducto);
+            nOrden.registrarDetalleOrden(cantidad, precio, idOrdenSeleccionada, idProducto);
 
             // Reducir el stock del producto
             int nuevoStock = stockDisponible - cantidad;
@@ -420,7 +416,7 @@ public class POrden extends AppCompatActivity {
     }
 
     private void actualizarEstadoOrden(String idOrden) {
-        // Obtener el estado seleccionado
+        // Validar estado seleccionado
         RadioGroup radioGroupEstado = findViewById(R.id.radioGroupEstado);
         int estadoSeleccionadoId = radioGroupEstado.getCheckedRadioButtonId();
         String nuevoEstado = "";
@@ -434,15 +430,26 @@ public class POrden extends AppCompatActivity {
             return;
         }
 
-        // Obtener el repartidor seleccionado
+        // Validar lista de repartidores
+        if (repartidoresDisponibles == null || repartidoresDisponibles.isEmpty()) {
+            Toast.makeText(this, "No hay repartidores disponibles.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validar repartidor seleccionado
         int posicionRepartidorSeleccionado = spinnerRepartidor.getSelectedItemPosition();
+        if (posicionRepartidorSeleccionado < 0 || posicionRepartidorSeleccionado >= repartidoresDisponibles.size()) {
+            Toast.makeText(this, "Por favor, selecciona un repartidor válido.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Obtener repartidor seleccionado
         Map<String, String> repartidorSeleccionado = repartidoresDisponibles.get(posicionRepartidorSeleccionado);
         int idRepartidorSeleccionado = Integer.parseInt(repartidorSeleccionado.get("id"));
 
-        // Actualizar el estado y el repartidor en la orden
+        // Actualizar estado y repartidor
         nOrden.actualizarEstadoYRepartidor(Integer.parseInt(idOrden), nuevoEstado, idRepartidorSeleccionado);
 
-        // Mostrar un mensaje de confirmación
         Toast.makeText(this, "Estado de la orden actualizado", Toast.LENGTH_SHORT).show();
 
         // Volver a la lista de órdenes
@@ -451,6 +458,11 @@ public class POrden extends AppCompatActivity {
 
     private void cargarRepartidores() {
         repartidoresDisponibles = nRepartidor.obtenerRepartidores();
+
+        if (repartidoresDisponibles == null || repartidoresDisponibles.isEmpty()) {
+            Toast.makeText(this, "No hay repartidores disponibles.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         List<String> nombresRepartidores = new ArrayList<>();
         for (Map<String, String> repartidor : repartidoresDisponibles) {

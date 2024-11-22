@@ -65,7 +65,7 @@
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".presentacion.detalleOrden.PDetalleOrden"
+            android:name=".presentacion.orden.PDetalleOrden"
             android:label="Detalles de la Orden"
             android:parentActivityName=".MainActivity" />
 
@@ -75,7 +75,7 @@
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".presentacion.catalogoProducto.PCatalogoProducto"
+            android:name=".presentacion.catalogo.PCatalogoProducto"
             android:label="Productos del Catálogo"
             android:parentActivityName=".MainActivity" />
 

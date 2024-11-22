@@ -4,7 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.example.primerparcial.datos.orden.DOrden;
-import com.example.primerparcial.negocio.detalleOrden.NDetalleOrden;
+import com.example.primerparcial.datos.producto.DProducto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,20 +14,120 @@ import java.util.Map;
 public class NOrden {
 
     private DOrden dOrden;
-    private NDetalleOrden nDetalleOrden;
+    private DProducto dProducto;
 
     // Constructor
     public NOrden(Context context) {
         dOrden = new DOrden(context);
-        nDetalleOrden = new NDetalleOrden(context);
+        dProducto = new DProducto(context);
     }
 
-    // Método para registrar una nueva orden
+    // Métodos relacionados con detalles de la orden
+    public String registrarDetalleOrden(int cantidad, double precio, int idOrden, int idProducto) {
+        int stockDisponible = dProducto.obtenerStockProducto(idProducto);
+        if (cantidad > stockDisponible) {
+            return "La cantidad no puede ser mayor al stock disponible.";
+        }
+        if (cantidad == 0) {
+            return "La cantidad no puede ser 0.";
+        }
+
+        dOrden.insertarDetalleOrden(cantidad, precio, idOrden, idProducto);
+        double totalDetalle = cantidad * precio;
+        dOrden.actualizarTotalOrden(idOrden, totalDetalle, true);
+
+        int nuevoStock = stockDisponible - cantidad;
+        dProducto.actualizarStock(idProducto, nuevoStock);
+
+        return "Producto añadido a la orden correctamente.";
+    }
+
+    public void eliminarDetalleOrden(int idOrden, int idProducto, int cantidad, double totalDetalle) {
+        dOrden.eliminarDetalleOrden(idOrden, idProducto);
+        dOrden.actualizarTotalOrden(idOrden, totalDetalle, false);
+
+        int stockActual = dProducto.obtenerStockProducto(idProducto);
+        int nuevoStock = stockActual + cantidad;
+        dProducto.actualizarStock(idProducto, nuevoStock);
+    }
+
+    public boolean verificarProductoEnOrden(int idOrden, int idProducto) {
+        return dOrden.productoYaEnOrden(idOrden, idProducto);
+    }
+
+    public List<Map<String, String>> obtenerDetallesPorOrden(int idOrden) {
+        Cursor cursor = dOrden.obtenerDetallesPorOrden(idOrden);
+        List<Map<String, String>> detalles = new ArrayList<>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                Map<String, String> detalleMap = new HashMap<>();
+                detalleMap.put("cantidad", cursor.getString(cursor.getColumnIndexOrThrow("cantidad")));
+                detalleMap.put("precio", cursor.getString(cursor.getColumnIndexOrThrow("precio")));
+                detalleMap.put("idProducto", cursor.getString(cursor.getColumnIndexOrThrow("idProducto")));
+                detalleMap.put("idOrden", cursor.getString(cursor.getColumnIndexOrThrow("idOrden")));
+
+                int idProducto = cursor.getInt(cursor.getColumnIndexOrThrow("idProducto"));
+                Cursor productoCursor = dProducto.obtenerProductoPorId(idProducto);
+
+                if (productoCursor.moveToFirst()) {
+                    detalleMap.put("nombre", productoCursor.getString(productoCursor.getColumnIndexOrThrow("nombre")));
+                    detalleMap.put("imagenPath", productoCursor.getString(productoCursor.getColumnIndexOrThrow("imagenPath")));
+                }
+                productoCursor.close();
+
+                int cantidad = cursor.getInt(cursor.getColumnIndexOrThrow("cantidad"));
+                double precio = cursor.getDouble(cursor.getColumnIndexOrThrow("precio"));
+                detalleMap.put("monto", String.valueOf(cantidad * precio));
+
+                detalles.add(detalleMap);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return detalles;
+    }
+
+    public void actualizarCantidadDetalleOrden(int idOrden, int idProducto, int nuevaCantidad, int cantidadAnterior, double precio) {
+        int diferenciaCantidad = nuevaCantidad - cantidadAnterior;
+        int stockDisponible = dProducto.obtenerStockProducto(idProducto);
+
+        if (diferenciaCantidad > 0 && diferenciaCantidad > stockDisponible) {
+            throw new IllegalArgumentException("La cantidad no puede ser mayor al stock disponible.");
+        }
+
+        int nuevoStock = (diferenciaCantidad > 0)
+                ? stockDisponible - diferenciaCantidad
+                : stockDisponible + Math.abs(diferenciaCantidad);
+        dProducto.actualizarStock(idProducto, nuevoStock);
+
+        dOrden.actualizarCantidad(idOrden, idProducto, nuevaCantidad);
+
+        double nuevoMontoDetalle = nuevaCantidad * precio;
+        double montoDetalleAnterior = cantidadAnterior * precio;
+        dOrden.actualizarTotalOrden(idOrden, nuevoMontoDetalle - montoDetalleAnterior, true);
+    }
+
+    public void eliminarDetallesPorOrden(int idOrden) {
+        List<Map<String, String>> detalles = obtenerDetallesPorOrden(idOrden);
+
+        for (Map<String, String> detalle : detalles) {
+            int idProducto = Integer.parseInt(detalle.get("idProducto"));
+            int cantidad = Integer.parseInt(detalle.get("cantidad"));
+
+            int stockActual = dProducto.obtenerStockProducto(idProducto);
+            int nuevoStock = stockActual + cantidad;
+            dProducto.actualizarStock(idProducto, nuevoStock);
+        }
+
+        dOrden.eliminarDetallesPorOrden(idOrden);
+    }
+
+    // Métodos originales de NOrden
     public void registrarOrden(String fecha, String estado, double total, int idCliente, int idRepartidor) {
         dOrden.insertarOrden(fecha, estado, total, idCliente, idRepartidor);
     }
 
-    // Método para obtener todas las órdenes
     public List<Map<String, String>> obtenerOrdenes() {
         List<Map<String, String>> ordenes = new ArrayList<>();
         Cursor cursor = dOrden.obtenerOrdenes();
@@ -51,17 +151,12 @@ public class NOrden {
         return ordenes;
     }
 
-    // Método para actualizar una orden
     public void actualizarOrden(int id, String fecha, String estado, double total, int idCliente, int idRepartidor) {
         dOrden.actualizarOrden(id, fecha, estado, total, idCliente, idRepartidor);
     }
 
-    // Método para eliminar una orden
     public void eliminarOrden(int id) {
-        // Primero eliminar los detalles de la orden
-        nDetalleOrden.eliminarDetallesPorOrden(id);
-
-        // Luego eliminar la orden
+        eliminarDetallesPorOrden(id);
         dOrden.eliminarOrden(id);
     }
 
@@ -69,23 +164,18 @@ public class NOrden {
         return dOrden.obtenerTotalOrden(idOrden);
     }
 
-    // Método para actualizar el estado y asignar un repartidor a la orden
     public void actualizarEstadoYRepartidor(int idOrden, String nuevoEstado, int idRepartidor) {
         if (!nuevoEstado.equals("Enviado") && !nuevoEstado.equals("Completado")) {
             throw new IllegalArgumentException("Estado no válido. Debe ser 'Enviado' o 'Completado'.");
         }
-
         dOrden.actualizarEstadoYRepartidor(idOrden, nuevoEstado, idRepartidor);
     }
 
-    // Método para obtener los datos del cliente a partir de una orden
     public Map<String, String> obtenerDatosCliente(int idOrden) {
-        // Llamamos al método en DOrden para obtener los datos del cliente
         return dOrden.obtenerDatosCliente(idOrden);
     }
 
     public Map<String, String> obtenerDatosOrden(int idOrden) {
         return dOrden.obtenerDatosOrden(idOrden);
     }
-
 }

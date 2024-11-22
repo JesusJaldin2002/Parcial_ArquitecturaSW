@@ -1,9 +1,7 @@
-package com.example.primerparcial.presentacion.detalleOrden.strategy;
+package com.example.primerparcial.presentacion.orden.strategy;
 
 import android.content.Context;
 import android.net.Uri;
-
-import com.example.primerparcial.presentacion.detalleOrden.strategy.DocumentStrategy;
 
 import java.util.List;
 import java.util.Map;
@@ -21,10 +19,14 @@ public class DocumentContext {
     }
 
     // Cambia el método para aceptar parámetros desglosados
-    public void executeStrategy(int orderId, Map<String, String> orderData,
-                                Map<String, String> clientData, List<Map<String, String>> orderDetails) {
-        // Llama a la estrategia usando los datos desglosados
+    public void executeStrategy(
+            int orderId,
+            Map<String, String> orderData,
+            Map<String, String> clientData,
+            List<Map<String, String>> orderDetails) {
+        // Llama a la estrategia usando los datos
         Uri documentUri = strategy.generateDocument(orderId, orderData, clientData, orderDetails);
+
         String phoneNumber = clientData.get("nroTelefono");
         strategy.shareDocument(documentUri, phoneNumber);
     }
