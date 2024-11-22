@@ -49,7 +49,8 @@ public class PDetalleOrden extends AppCompatActivity {
 
         nOrden = new NOrden(this);
         nProducto = new NProducto(this);
-        documentContext = new DocumentContext(this);
+        // Instancia de `DocumentContext`, que utiliza estrategias para generar documentos.
+        documentContext = new DocumentContext(this); // La relación de agregación comienza aquí.
 
         // Recibir el id de la orden
         Intent intent = getIntent();
@@ -61,7 +62,7 @@ public class PDetalleOrden extends AppCompatActivity {
 
         Button btnGenerarPDF = findViewById(R.id.btnGenerarPdf);
         btnGenerarPDF.setOnClickListener(v ->
-                ejecutarEstrategia(new PDFStrategy(this)));
+                ejecutarEstrategia(new PDFStrategy(this))); // Se inyecta la estrategia concreta: PDFStrategy.
 
         Button btnGenerarJPG = findViewById(R.id.btnGenerarJpg);
         btnGenerarJPG.setOnClickListener(v ->
@@ -81,6 +82,8 @@ public class PDetalleOrden extends AppCompatActivity {
     }
 
     private void ejecutarEstrategia(DocumentStrategy strategy) {
+
+        // Relación de agregación: se asigna una estrategia concreta al contexto.
         documentContext.setStrategy(strategy);
 
         // Obtén los datos
